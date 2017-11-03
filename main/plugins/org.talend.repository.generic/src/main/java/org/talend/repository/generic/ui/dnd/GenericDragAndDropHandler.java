@@ -104,6 +104,12 @@ public class GenericDragAndDropHandler extends AbstractDragAndDropServiceHandler
     private Object getGenericRepositoryValue(Connection connection, List<ComponentProperties> componentProperties,
             String value, IMetadataTable table) {
         if (componentProperties != null && value != null) {
+            if(EConnectionParameterName.USERNAME.getName().equals(value)){
+                value = EConnectionParameterName.GENERIC_USERNAME.getDisplayName();
+            }
+            if(EConnectionParameterName.PASSWORD.getName().equals(value)){
+                value = EConnectionParameterName.GENERIC_PASSWORD.getDisplayName();
+            }
             for (ComponentProperties compPro : componentProperties) {
                 if(isGenericPropertiesValue(value)){
                     Properties properties = compPro.getProperties(value);
@@ -132,7 +138,7 @@ public class GenericDragAndDropHandler extends AbstractDragAndDropServiceHandler
                         value.substring(value.indexOf(IGenericConstants.EXP_SEPARATOR) + 1), table);
             }
         }
-        if(connection instanceof DatabaseConnection){
+        if((connection instanceof DatabaseConnection) && value.equals("TYPE")){
             return ((DatabaseConnection)connection).getDatabaseType();
         }
         return null;

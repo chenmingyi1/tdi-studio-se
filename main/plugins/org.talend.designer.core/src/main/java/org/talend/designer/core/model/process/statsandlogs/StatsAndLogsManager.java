@@ -29,6 +29,7 @@ import org.talend.core.model.components.ComponentCategory;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.general.ModuleNeeded;
 import org.talend.core.model.metadata.IMetadataTable;
+import org.talend.core.model.param.EConnectionParameterName;
 import org.talend.core.model.param.ERepositoryCategoryType;
 import org.talend.core.model.process.EComponentCategory;
 import org.talend.core.model.process.EConnectionType;
@@ -178,7 +179,10 @@ public class StatsAndLogsManager {
                         commitNode = new DataNode(commitComponent, connectionUID2);
                         commitNode.setSubProcessStart(true);
                         commitNode.setActivate(true);
-                        commitNode.getElementParameter(EParameterName.CONNECTION.getName()).setValue(CONNECTION_UID);
+                        IElementParameter param = commitNode.getElementParameter(EParameterName.CONNECTION.getName());
+                        if (param != null) {
+                            param.setValue(CONNECTION_UID);
+                        }
                         IElementParameter elementParameter = commitNode.getElementParameter("CLOSE");
                         if (elementParameter != null) {
                             elementParameter.setValue(Boolean.FALSE);
@@ -607,13 +611,28 @@ public class StatsAndLogsManager {
                     process.getElementParameter(EParameterName.URL.getName()).getValue());
         }
 
+        if (connectionNode.getElementParameter(EConnectionParameterName.GENERIC_URL.getDisplayName()) != null) {
+            connectionNode.getElementParameter(EConnectionParameterName.GENERIC_URL.getDisplayName()).setValue(
+                    process.getElementParameter(EParameterName.URL.getName()).getValue());
+        }
+
         if (connectionNode.getElementParameter(EParameterName.DRIVER_JAR.getName()) != null) {
             connectionNode.getElementParameter(EParameterName.DRIVER_JAR.getName()).setValue(
+                    process.getElementParameter(EParameterName.DRIVER_JAR.getName()).getValue());
+        }
+        
+        if (connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName()) != null) {
+            connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName()).setValue(
                     process.getElementParameter(EParameterName.DRIVER_JAR.getName()).getValue());
         }
 
         if (connectionNode.getElementParameter(EParameterName.DRIVER_CLASS.getName()) != null) {
             connectionNode.getElementParameter(EParameterName.DRIVER_CLASS.getName()).setValue(
+                    process.getElementParameter(EParameterName.DRIVER_CLASS.getName()).getValue());
+        }
+        
+        if (connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_CLASS.getDisplayName()) != null) {
+            connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_CLASS.getDisplayName()).setValue(
                     process.getElementParameter(EParameterName.DRIVER_CLASS.getName()).getValue());
         }
 
@@ -647,9 +666,19 @@ public class StatsAndLogsManager {
             connectionNode.getElementParameter(EParameterName.USER.getName()).setValue(
                     process.getElementParameter(EParameterName.USER.getName()).getValue());
         }
+        
+        if (connectionNode.getElementParameter(EConnectionParameterName.GENERIC_USERNAME.getDisplayName()) != null) {
+            connectionNode.getElementParameter(EConnectionParameterName.GENERIC_USERNAME.getDisplayName()).setValue(
+                    process.getElementParameter(EParameterName.USER.getName()).getValue());
+        }
 
         if (connectionNode.getElementParameter(EParameterName.PASS.getName()) != null) {
             connectionNode.getElementParameter(EParameterName.PASS.getName()).setValue(
+                    process.getElementParameter(EParameterName.PASS.getName()).getValue());
+        }
+        
+        if (connectionNode.getElementParameter(EConnectionParameterName.GENERIC_PASSWORD.getDisplayName()) != null) {
+            connectionNode.getElementParameter(EConnectionParameterName.GENERIC_PASSWORD.getDisplayName()).setValue(
                     process.getElementParameter(EParameterName.PASS.getName()).getValue());
         }
 
@@ -1027,7 +1056,7 @@ public class StatsAndLogsManager {
         param.setFieldType(EParameterFieldType.TEXT);
         param.setCategory(EComponentCategory.STATSANDLOGS);
         param.setNumRow(53);
-        param.setRepositoryValue("URL"); //$NON-NLS-1$
+        param.setRepositoryValue(EConnectionParameterName.GENERIC_URL.getDisplayName()); //$NON-NLS-1$
         param.setShowIf("(ON_DATABASE_FLAG == 'true') and (ON_STATCATCHER_FLAG == 'true' or ON_LOGCATCHER_FLAG == 'true' or ON_METERCATCHER_FLAG == 'true') and (DB_TYPE=='JDBC')"); //$NON-NLS-1$
         paramList.add(param);
 
@@ -1055,8 +1084,8 @@ public class StatsAndLogsManager {
         String[] moduleNameArray = moduleNameList.toArray(new String[0]);
         String[] moduleValueArray = moduleValueList.toArray(new String[0]);
         ElementParameter childParam = new ElementParameter(process);
-        childParam.setName("JAR_NAME");
-        childParam.setDisplayName("JAR_NAME");
+        childParam.setName("drivers");
+        childParam.setDisplayName("drivers");
         childParam.setFieldType(EParameterFieldType.MODULE_LIST);
         childParam.setListItemsDisplayName(moduleNameArray);
         childParam.setListItemsValue(moduleValueArray);
@@ -1065,13 +1094,13 @@ public class StatsAndLogsManager {
         param.setName(EParameterName.DRIVER_JAR.getName());
         param.setDisplayName(EParameterName.DRIVER_JAR.getDisplayName());
         param.setFieldType(EParameterFieldType.TABLE);
-        param.setListItemsDisplayCodeName(new String[] { "JAR_NAME" });
-        param.setListItemsDisplayName(new String[] { "Jar Name" });
+        param.setListItemsDisplayCodeName(new String[] { "drivers" });
+        param.setListItemsDisplayName(new String[] { "drivers" });
         param.setListItemsValue(new ElementParameter[] { childParam });
         param.setValue(new ArrayList<Map<String, Object>>());
         param.setCategory(EComponentCategory.STATSANDLOGS);
         param.setNumRow(54);
-        param.setRepositoryValue("DRIVER_JAR"); //$NON-NLS-1$
+        param.setRepositoryValue(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName()); //$NON-NLS-1$
         param.setShowIf("(ON_DATABASE_FLAG == 'true') and (ON_STATCATCHER_FLAG == 'true' or ON_LOGCATCHER_FLAG == 'true' or ON_METERCATCHER_FLAG == 'true') and (DB_TYPE=='JDBC')"); //$NON-NLS-1$
         paramList.add(param);
 
@@ -1083,7 +1112,7 @@ public class StatsAndLogsManager {
         param.setFieldType(EParameterFieldType.TEXT);
         param.setCategory(EComponentCategory.STATSANDLOGS);
         param.setNumRow(57);
-        param.setRepositoryValue("DRIVER_CLASS"); //$NON-NLS-1$
+        param.setRepositoryValue(EConnectionParameterName.GENERIC_DRIVER_CLASS.getDisplayName()); //$NON-NLS-1$
         param.setShowIf("(ON_DATABASE_FLAG == 'true') and (ON_STATCATCHER_FLAG == 'true' or ON_LOGCATCHER_FLAG == 'true' or ON_METERCATCHER_FLAG == 'true') and (DB_TYPE=='JDBC')"); //$NON-NLS-1$
         paramList.add(param);
 

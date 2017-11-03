@@ -1652,9 +1652,9 @@ public abstract class AbstractElementPropertySectionController implements Proper
         }
         connParameters.setDbName(dbName);
         if ((elem instanceof Node) && ((Node)elem).getComponent().getComponentType().equals(EComponentType.GENERIC)) {
-            connParameters.setPassword(getParameterValueWithContext(element, EConnectionParameterName.GENERIC_USERNAME.getDisplayName(), context,
+            connParameters.setUserName(getParameterValueWithContext(element, EConnectionParameterName.GENERIC_USERNAME.getDisplayName(), context,
                     basePropertyParameter));
-            connParameters.setUserName(getParameterValueWithContext(element, EConnectionParameterName.GENERIC_PASSWORD.getDisplayName(), context,
+            connParameters.setPassword(getParameterValueWithContext(element, EConnectionParameterName.GENERIC_PASSWORD.getDisplayName(), context,
                     basePropertyParameter));
             String url = TalendTextUtils.removeQuotesIfExist(getParameterValueWithContext(element, EConnectionParameterName.GENERIC_URL.getDisplayName(), context,
                     basePropertyParameter));
