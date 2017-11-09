@@ -3552,8 +3552,26 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
             // }
             setPropertyValue(updataComponentParamName, Boolean.TRUE);
         }
-
+        if(id.equals("DRIVER_JAR")){
+            getDriverJar(value);
+        }
         super.setPropertyValue(id, value);
+    }
+    
+    private void getDriverJar(Object value){
+        if(value instanceof List){
+            List objs = (List) value;
+            for(Object obj : objs){
+                if(obj instanceof Map){
+                    Map map = (Map) obj;
+                    String driver = (String) map.get("drivers");
+                    if(driver.contains("/")){
+                        driver = driver.split("/")[1]+".jar";
+                    }
+                    map.put("drivers", driver);
+                }
+            }
+        }
     }
 
     @Override

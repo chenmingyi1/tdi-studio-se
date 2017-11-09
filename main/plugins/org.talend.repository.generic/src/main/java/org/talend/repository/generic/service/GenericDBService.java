@@ -33,20 +33,23 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.talend.commons.runtime.model.components.IComponentConstants;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.components.api.wizard.ComponentWizard;
 import org.talend.components.api.wizard.ComponentWizardDefinition;
-import org.talend.core.GlobalServiceRegister;
-import org.talend.core.ILibraryManagerService;
 import org.talend.core.model.general.ModuleNeeded;
 import org.talend.core.model.metadata.IMetadataTable;
+import org.talend.core.model.metadata.MetadataToolAvroHelper;
+import org.talend.core.model.metadata.MetadataToolHelper;
+import org.talend.core.model.metadata.builder.ConvertionHelper;
 import org.talend.core.model.metadata.builder.connection.Connection;
 import org.talend.core.model.metadata.builder.connection.DatabaseConnection;
 import org.talend.core.model.param.EConnectionParameterName;
 import org.talend.core.model.process.EComponentCategory;
 import org.talend.core.model.process.Element;
 import org.talend.core.model.process.IElementParameter;
+import org.talend.core.model.process.INode;
 import org.talend.core.model.properties.ConnectionItem;
 import org.talend.core.model.properties.DatabaseConnectionItem;
 import org.talend.core.model.properties.Item;
@@ -62,6 +65,7 @@ import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.PropertiesImpl;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.property.SchemaProperty;
 import org.talend.designer.core.generic.constants.IGenericConstants;
 import org.talend.designer.core.generic.model.GenericElementParameter;
 import org.talend.designer.core.generic.model.GenericTableUtils;
@@ -78,6 +82,9 @@ import org.talend.repository.generic.ui.context.handler.GenericContextHandler;
 import org.talend.repository.generic.update.GenericUpdateManager;
 import org.talend.repository.generic.util.GenericWizardServiceFactory;
 import org.talend.repository.model.IProxyRepositoryFactory;
+
+import orgomg.cwm.objectmodel.core.CoreFactory;
+import orgomg.cwm.objectmodel.core.TaggedValue;
 
 /**
  * DOC hwang  class global comment. Detailled comment
@@ -302,5 +309,35 @@ public class GenericDBService implements IGenericDBService{
             }
         }
         return value;
+    }
+
+    @Override
+    public IMetadataTable converTable(INode node, IMetadataTable iTable) {
+        org.talend.core.model.metadata.builder.connection.MetadataTable table = ConvertionHelper.convert(iTable);
+        ComponentProperties properties = node.getComponentProperties();
+        Properties mainProperties = properties.getProperties("main");
+        Properties flowProperties = properties.getProperties("schemaFlow");
+        Properties rejectProperties = properties.getProperties("schemaReject");
+        if(mainProperties != null){
+            mainProperties.setValue("schema", MetadataToolAvroHelper.convertToAvro(table));
+        }
+        if(flowProperties != null){
+            flowProperties.setValue("schema", MetadataToolAvroHelper.convertToAvro(table));
+        }
+        if(rejectProperties != null){
+            rejectProperties.setValue("schema", MetadataToolAvroHelper.convertToAvro(table));
+        }
+        
+        TaggedValue serializedPropsTV = CoreFactory.eINSTANCE.createTaggedValue();
+        serializedPropsTV.setTag(IComponentConstants.COMPONENT_PROPERTIES_TAG);
+        serializedPropsTV.setValue(properties.toSerialized());
+        table.getTaggedValue().add(serializedPropsTV);
+        TaggedValue schemaPropertyTV = CoreFactory.eINSTANCE.createTaggedValue();
+        schemaPropertyTV.setTag(IComponentConstants.COMPONENT_SCHEMA_TAG);
+        schemaPropertyTV.setValue("schema");
+        table.getTaggedValue().add(schemaPropertyTV);
+        
+        iTable = MetadataToolHelper.convert(table);
+        return iTable;
     }
 }

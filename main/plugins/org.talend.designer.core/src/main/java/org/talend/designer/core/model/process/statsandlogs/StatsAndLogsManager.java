@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.talend.core.GlobalServiceRegister;
 import org.talend.core.database.EDatabaseTypeName;
 import org.talend.core.database.conn.DatabaseConnStrUtil;
 import org.talend.core.language.ECodeLanguage;
@@ -39,6 +40,7 @@ import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.IProcess;
 import org.talend.core.model.utils.ContextParameterUtils;
 import org.talend.core.model.utils.TalendTextUtils;
+import org.talend.core.runtime.services.IGenericDBService;
 import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.designer.core.DesignerPlugin;
 import org.talend.designer.core.model.components.EParameterName;
@@ -447,6 +449,11 @@ public class StatsAndLogsManager {
         DataConnection dataConnec = createDataConnectionForSubJobOK(dataNode, commitNode);
         ((List<IConnection>) dataNode.getOutgoingConnections()).add(dataConnec);
         ((List<IConnection>) commitNode.getIncomingConnections()).add(dataConnec);
+        
+        IElementParameter refPara = commitNode.getElementParameter("referencedComponent");
+        if(refPara != null){
+            refPara.setValue(connectionNode.getUniqueName());
+        }
         return connectionNode;
     }
 
@@ -622,8 +629,10 @@ public class StatsAndLogsManager {
         }
         
         if (connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName()) != null) {
-            connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName()).setValue(
-                    process.getElementParameter(EParameterName.DRIVER_JAR.getName()).getValue());
+            IElementParameter elePara = connectionNode.getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName());
+            Object value = process.getElementParameter(EParameterName.DRIVER_JAR.getName()).getValue();
+            getMVNDriverJar(elePara, value);
+            elePara.setValue(value);
         }
 
         if (connectionNode.getElementParameter(EParameterName.DRIVER_CLASS.getName()) != null) {
@@ -682,6 +691,29 @@ public class StatsAndLogsManager {
                     process.getElementParameter(EParameterName.PASS.getName()).getValue());
         }
 
+    }
+    
+    private static void getMVNDriverJar(IElementParameter elePara, Object value){
+        IGenericDBService dbService = null;
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IGenericDBService.class)) {
+            dbService = (IGenericDBService) GlobalServiceRegister.getDefault().getService(
+                    IGenericDBService.class);
+        }
+        if(dbService == null){
+            return;
+        }
+        
+        if(value instanceof List){
+            List objs = (List) value;
+            for(Object obj : objs){
+                if(obj instanceof Map){
+                    Map map = (Map) obj;
+                    String driver = (String) map.get("drivers");
+                    driver = dbService.getMVNPath(elePara, driver);
+                    map.put("drivers", driver);
+                }
+            }
+        }
     }
 
     private static DataNode createLogsNode(boolean useFile, boolean console, String dbOutput) {

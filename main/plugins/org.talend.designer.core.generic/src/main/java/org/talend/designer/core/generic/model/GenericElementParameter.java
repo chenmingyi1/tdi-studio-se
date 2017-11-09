@@ -188,30 +188,31 @@ public class GenericElementParameter extends ElementParameter implements IGeneri
             }
         } else if (widgetProperty instanceof ComponentProperties && Widget.TABLE_WIDGET_TYPE.equals(widget.getWidgetType())) {
             GenericTableUtils.setTableValues((ComponentProperties) widgetProperty, (List<Map<String, Object>>) newValue, this);
-        } else if (widgetProperty instanceof ComponentReferenceProperties 
-                && Widget.COMPONENT_REFERENCE_WIDGET_TYPE.equals(widget.getWidgetType())) {
-            ComponentReferenceProperties props = (ComponentReferenceProperties)widgetProperty;
-            if(newValue == null || newValue.toString().length() <= 0){
-                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
-                props.componentInstanceId.setValue(null);
-                props.setReference(null);
-            }else{
-                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
-                props.componentInstanceId.setValue(newValue);
-                if (this.getElement() != null
-                        && this.getElement() instanceof Node) {
-                    Node node = (Node) this.getElement();
-                    List<INode> refNodes = (List<INode>) node.getProcess().getNodesOfType(
-                            props.referenceDefinitionName.getStringValue());
-                    for (INode refNode : refNodes) {
-                        if (refNode.getUniqueName() != null && refNode.getUniqueName().equals(newValue)) {
-                            props.setReference(refNode.getComponentProperties());
-                        }
-                    }
-                }
-            }
-            
         }
+//        else if (widgetProperty instanceof ComponentReferenceProperties 
+//                && Widget.COMPONENT_REFERENCE_WIDGET_TYPE.equals(widget.getWidgetType())) {
+//            ComponentReferenceProperties props = (ComponentReferenceProperties)widgetProperty;
+//            if(newValue == null || newValue.toString().length() <= 0){
+//                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
+//                props.componentInstanceId.setValue(null);
+//                props.setReference(null);
+//            }else{
+//                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
+//                props.componentInstanceId.setValue(newValue);
+//                if (this.getElement() != null && props.referenceDefinitionName != null
+//                        && props.referenceDefinitionName.getStringValue() != null && this.getElement() instanceof INode) {
+//                    INode node = (INode) this.getElement();
+//                    List<INode> refNodes = (List<INode>) node.getProcess().getNodesOfType(
+//                            props.referenceDefinitionName.getStringValue());
+//                    for (INode refNode : refNodes) {
+//                        if (refNode.getUniqueName() != null && refNode.getUniqueName().equals(newValue)) {
+//                            props.setReference(refNode.getComponentProperties());
+//                        }
+//                    }
+//                }
+//            }
+//            
+//        }
     }
 
     private boolean hasPropertyChangeListener() {
