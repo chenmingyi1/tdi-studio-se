@@ -54,7 +54,7 @@ String enclosing_char = ElementParameterParser.getValue(node, "__ENCLOSED_BY_VAL
 boolean is_enforcing_length = ("true").equals(ElementParameterParser.getValue(node, "__ENFORCELENGTH_OPTION__"));
 boolean is_rejected_max = ("true").equals(ElementParameterParser.getValue(node, "__REJECTMAX_OPTION__"));
 String rejected_max_value = ElementParameterParser.getValue(node, "__REJECTMAX_VALUE__");
-boolean is_abort_on_error = ("true").equals(ElementParameterParser.getValue(node, "__ABORT_ON_ERROR_OPTION__"));
+boolean is_abort_on_error = ("true").equals(ElementParameterParser.getValue(node, "__ON_ERROR_ABORT_OPTION__"));
 boolean is_no_commit = ("true").equals(ElementParameterParser.getValue(node, "__NO_COMMIT_OPTION__"));
 
 List<IMetadataColumn> columnList = getColumnList(node);    
