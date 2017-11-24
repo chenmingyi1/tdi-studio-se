@@ -67,7 +67,8 @@ public class ReadQueriesAction extends AContextualAction {
 
         DatabaseConnectionItem dbConnectionItem = null;
         ConnectionParameters connParameters = new ConnectionParameters();
-        if (repositoryNode.getObjectType() == ERepositoryObjectType.METADATA_CONNECTIONS) {
+        if (repositoryNode.getObjectType() == ERepositoryObjectType.METADATA_CONNECTIONS || 
+                repositoryNode.getProperties(EProperties.CONTENT_TYPE) == ERepositoryObjectType.METADATA_CONNECTIONS) {
             dbConnectionItem = (DatabaseConnectionItem) repositoryNode.getObject().getProperty().getItem();
             connParameters.setRepositoryName(repositoryNode.getObject().getLabel());
             connParameters.setRepositoryId(repositoryNode.getObject().getId());
