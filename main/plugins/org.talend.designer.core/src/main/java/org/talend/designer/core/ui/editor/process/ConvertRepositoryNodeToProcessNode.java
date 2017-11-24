@@ -32,7 +32,10 @@ import org.talend.core.model.process.IContext;
 import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.INode;
 import org.talend.core.model.properties.ConnectionItem;
+import org.talend.core.model.repository.DragAndDropManager;
 import org.talend.core.model.repository.ERepositoryObjectType;
+import org.talend.core.model.utils.IComponentName;
+import org.talend.core.model.utils.IDragAndDropServiceHandler;
 import org.talend.core.model.utils.TalendTextUtils;
 import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.core.utils.CsvArray;
@@ -111,7 +114,22 @@ public class ConvertRepositoryNodeToProcessNode {
         EDatabaseComponentName name = EDatabaseComponentName.getCorrespondingComponentName(connectionItem,
                 ERepositoryObjectType.METADATA_CONNECTIONS);
         String componentName = null;
-        componentName = name.getDefaultComponentName();
+        if(name != null){
+            componentName = name.getDefaultComponentName();
+        }
+        if(componentName == null ){
+            IComponentName rcSetting = null;
+            for (IDragAndDropServiceHandler handler : DragAndDropManager.getHandlers()) {
+                rcSetting = handler.getCorrespondingComponentName(connectionItem, ERepositoryObjectType.METADATA_CONNECTIONS);
+                if (rcSetting != null) {
+                    break;
+                }
+            }
+            if(rcSetting != null){
+                componentName = rcSetting.getDefaultComponentName();
+            }
+        }
+        
         IComponent dbInputComponent = ComponentsFactoryProvider.getInstance().get(componentName,
                 ComponentCategory.CATEGORY_4_DI.getName());
         Process process = new Process(GuessSchemaProcess.getNewmockProperty());
@@ -156,8 +174,8 @@ public class ConvertRepositoryNodeToProcessNode {
         // execute the commands
         cc.execute();
 
-        IElementParameter query = node.getElementParameter("QUERY"); //$NON-NLS-1$
-        //
+        IElementParameter query = node.getElementParameterFromField(EParameterFieldType.MEMO_SQL);
+        
         memoSQL = query.getValue().toString();
         String memoSQLTemp = TalendTextUtils.removeQuotesIfExist(memoSQL);
         if ((memoSQLTemp == null || memoSQLTemp.equals("")) && tableName != null && !tableName.equals("")) {
