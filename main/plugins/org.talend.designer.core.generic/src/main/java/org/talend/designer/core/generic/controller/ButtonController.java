@@ -38,6 +38,8 @@ import org.talend.designer.core.ui.editor.properties.controllers.AbstractElement
  *
  */
 public class ButtonController extends AbstractElementPropertySectionController {
+    
+    private static final String GUESS_QUERY_NAME = "Guess Query"; //$NON-NLS-1$
 
     public ButtonController(IDynamicProperty dp) {
         super(dp);
@@ -45,6 +47,9 @@ public class ButtonController extends AbstractElementPropertySectionController {
 
     public Command createCommand(Button button) {
         IElementParameter parameter = (IElementParameter) button.getData();
+        if (button.getText() != null && button.getText().equals(GUESS_QUERY_NAME)) {
+            return getGuessQueryCommand();
+        }
         if (parameter != null) {
             callBeforeActive(parameter);
             // so as to invoke listeners to perform some actions.
