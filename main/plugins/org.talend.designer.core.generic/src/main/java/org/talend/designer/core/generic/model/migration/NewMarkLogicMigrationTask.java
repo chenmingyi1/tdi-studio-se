@@ -91,7 +91,7 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
         Iterator<ConnectionType> connectionIter = allInputConnectors.iterator();
         while (connectionIter.hasNext()) {
             ConnectionType nextConnector = connectionIter.next();
-            if (!nextConnector.getConnectorName().equals("FLOW")) {
+            if (!"FLOW".equals(nextConnector.getConnectorName())) {
                 connectionIter.remove();
             }
         }
@@ -101,8 +101,9 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
 
     private NodeType getSourceNode(List<ConnectionType> mainConnectors, NodeType target) {
         String sourceNodeUniqueName = null;
-        for (ConnectionType connection : mainConnectors) {
-            sourceNodeUniqueName = connection.getSource();
+        if (!mainConnectors.isEmpty()) {
+          //could be only 1 input main connector
+          sourceNodeUniqueName = mainConnectors.get(0).getSource(); 
         }
 
         List<NodeType> allNodes = getProcessType(item).getNode();
@@ -114,7 +115,7 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
         return null;
     }
 
-    private static boolean doesConnectorsContains(List<ConnectionType> connectors, String metadataConnectorName) {
+    private static boolean isConnectorPresent(List<ConnectionType> connectors, String metadataConnectorName) {
         for (ConnectionType connection : connectors) {
             if (connection.getMetaname().equalsIgnoreCase(metadataConnectorName)) {
                 return true;
@@ -139,7 +140,7 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
         } else if (allSourceNodeMetadatas.size() >= 2) {
             for (MetadataType metadata : allSourceNodeMetadatas) {
                 String connectorName = metadata.getName();
-                if (doesConnectorsContains(allInputMainConnectors, connectorName)) {
+                if (isConnectorPresent(allInputMainConnectors, connectorName)) {
                     sourceMetadata = metadata;
                     break;
                 }
