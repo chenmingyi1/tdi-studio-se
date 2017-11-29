@@ -328,19 +328,21 @@ public class GenericDragAndDropHandler extends AbstractDragAndDropServiceHandler
         List<Class<Item>> list = new ArrayList<Class<Item>>();
         if (item instanceof ConnectionItem) {
             Connection connection = ((ConnectionItem) item).getConnection();
-            setting = new RepositoryComponentSetting();
-            setting.setWithSchema(true);
-            String componentMainName = getComponentMainName(connection);
-            setting.setInputComponent(getInputComponentName(componentMainName));
-            setting.setOutputComponent(getOutputComponentName(componentMainName));
-            Class clazz = null;
-            try {
-                clazz = Class.forName(ConnectionItem.class.getName());
-            } catch (ClassNotFoundException e) {
-                ExceptionHandler.process(e);
+            if(canHandle(connection)){
+                setting = new RepositoryComponentSetting();
+                setting.setWithSchema(true);
+                String componentMainName = getComponentMainName(connection);
+                setting.setInputComponent(getInputComponentName(componentMainName));
+                setting.setOutputComponent(getOutputComponentName(componentMainName));
+                Class clazz = null;
+                try {
+                    clazz = Class.forName(ConnectionItem.class.getName());
+                } catch (ClassNotFoundException e) {
+                    ExceptionHandler.process(e);
+                }
+                list.add(clazz);
+                setting.setClasses(list.toArray(new Class[0]));
             }
-            list.add(clazz);
-            setting.setClasses(list.toArray(new Class[0]));
         }
         return setting;
     }
