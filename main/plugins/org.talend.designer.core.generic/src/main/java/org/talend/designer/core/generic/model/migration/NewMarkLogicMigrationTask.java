@@ -34,7 +34,7 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
 
     @Override
     public Date getOrder() {
-        return new GregorianCalendar(2017, 11, 21, 16, 0, 0).getTime();
+        return new GregorianCalendar(2017, 10, 21, 16, 0, 0).getTime();
     }
 
     @Override
