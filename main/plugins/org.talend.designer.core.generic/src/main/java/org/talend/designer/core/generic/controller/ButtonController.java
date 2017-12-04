@@ -13,7 +13,13 @@
 package org.talend.designer.core.generic.controller;
 
 import java.beans.PropertyChangeEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -25,12 +31,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
+import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.ui.runtime.image.ImageProvider;
+import org.talend.commons.utils.workbench.resources.ResourceUtils;
+import org.talend.core.GlobalServiceRegister;
+import org.talend.core.ILibraryManagerService;
+import org.talend.core.model.general.Project;
+import org.talend.core.model.metadata.builder.database.ExtractMetaDataUtils;
+import org.talend.core.model.param.EConnectionParameterName;
 import org.talend.core.model.process.IElementParameter;
 import org.talend.core.ui.CoreUIPlugin;
 import org.talend.core.ui.properties.tab.IDynamicProperty;
 import org.talend.designer.core.ui.editor.cmd.PropertyChangeCommand;
 import org.talend.designer.core.ui.editor.properties.controllers.AbstractElementPropertySectionController;
+import org.talend.repository.ProjectManager;
 
 /**
  * 
@@ -40,6 +54,8 @@ import org.talend.designer.core.ui.editor.properties.controllers.AbstractElement
 public class ButtonController extends AbstractElementPropertySectionController {
     
     private static final String GUESS_QUERY_NAME = "Guess Query"; //$NON-NLS-1$
+    
+    private static final String TEST_CONNECTION = "Test connection"; //$NON-NLS-1$
 
     public ButtonController(IDynamicProperty dp) {
         super(dp);
@@ -50,6 +66,9 @@ public class ButtonController extends AbstractElementPropertySectionController {
         if (button.getText() != null && button.getText().equals(GUESS_QUERY_NAME)) {
             return getGuessQueryCommand();
         }
+        if(button.getText() != null && button.getText().equals(TEST_CONNECTION)){
+            loadJars(parameter);
+        }
         if (parameter != null) {
             callBeforeActive(parameter);
             // so as to invoke listeners to perform some actions.
@@ -57,7 +76,28 @@ public class ButtonController extends AbstractElementPropertySectionController {
         }
         return null;
     }
-
+    
+    private void loadJars(IElementParameter parameter){
+        ILibraryManagerService librairesManagerService = (ILibraryManagerService) GlobalServiceRegister.getDefault().getService(
+                ILibraryManagerService.class);
+        if(librairesManagerService == null){
+            return;
+        }
+        IElementParameter drivers = parameter.getElement().getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName());
+        if(drivers == null){
+            return;
+        }
+        List driverList = (List) drivers.getValue();
+        List<String> jars = new ArrayList<String>();
+        for(Object obj : driverList){
+            if(obj instanceof Map){
+                Map d = (Map) obj;
+                jars.addAll(d.values());
+            }
+        }
+        librairesManagerService.retrieve(jars, ExtractMetaDataUtils.getInstance().getJavaLibPath(), new NullProgressMonitor());
+    }
+    
     @Override
     public Control createControl(Composite subComposite, IElementParameter param, int numInRow, int nbInRow, int top,
             Control lastControl) {
