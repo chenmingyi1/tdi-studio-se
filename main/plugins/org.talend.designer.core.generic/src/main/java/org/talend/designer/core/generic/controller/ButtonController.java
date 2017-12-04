@@ -31,20 +31,22 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
-import org.talend.commons.exception.ExceptionHandler;
 import org.talend.commons.ui.runtime.image.ImageProvider;
-import org.talend.commons.utils.workbench.resources.ResourceUtils;
+import org.talend.components.api.properties.ComponentProperties;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.ILibraryManagerService;
-import org.talend.core.model.general.Project;
 import org.talend.core.model.metadata.builder.database.ExtractMetaDataUtils;
-import org.talend.core.model.param.EConnectionParameterName;
 import org.talend.core.model.process.IElementParameter;
+import org.talend.core.runtime.util.GenericTypeUtils;
 import org.talend.core.ui.CoreUIPlugin;
 import org.talend.core.ui.properties.tab.IDynamicProperty;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.Properties;
+import org.talend.daikon.properties.property.Property;
+import org.talend.designer.core.generic.model.GenericElementParameter;
+import org.talend.designer.core.generic.model.GenericTableUtils;
 import org.talend.designer.core.ui.editor.cmd.PropertyChangeCommand;
 import org.talend.designer.core.ui.editor.properties.controllers.AbstractElementPropertySectionController;
-import org.talend.repository.ProjectManager;
 
 /**
  * 
@@ -83,16 +85,33 @@ public class ButtonController extends AbstractElementPropertySectionController {
         if(librairesManagerService == null){
             return;
         }
-        IElementParameter drivers = parameter.getElement().getElementParameter(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName());
+        if(!(parameter instanceof GenericElementParameter)){
+            return;
+        }
+        GenericElementParameter gPara = (GenericElementParameter) parameter;
+        ComponentProperties rootPro = gPara.getRootProperties();
+        if(rootPro == null){
+            return;
+        }
+        Properties connPro = rootPro.getProperties("connection"); //$NON-NLS-1$
+        if(connPro == null){
+            return;
+        }
+        Properties drivers = connPro.getProperties("driverTable"); //$NON-NLS-1$
         if(drivers == null){
             return;
         }
-        List driverList = (List) drivers.getValue();
         List<String> jars = new ArrayList<String>();
-        for(Object obj : driverList){
-            if(obj instanceof Map){
-                Map d = (Map) obj;
-                jars.addAll(d.values());
+        for(NamedThing thing : drivers.getProperties()){
+            if(!(thing instanceof Property)){
+                continue;
+            }
+            if(GenericTypeUtils.isListStringType((Property)thing)){
+                List<String> listString = (List<String>) ((Property)thing).getValue();
+                for(String path : listString){
+                    jars.add(GenericTableUtils.getDriverJarPath(path));
+                }
+                
             }
         }
         librairesManagerService.retrieve(jars, ExtractMetaDataUtils.getInstance().getJavaLibPath(), new NullProgressMonitor());
