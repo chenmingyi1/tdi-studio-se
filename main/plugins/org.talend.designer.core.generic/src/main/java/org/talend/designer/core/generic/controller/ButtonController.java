@@ -13,12 +13,9 @@
 package org.talend.designer.core.generic.controller;
 
 import java.beans.PropertyChangeEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.swt.SWT;
@@ -49,7 +46,6 @@ import org.talend.designer.core.ui.editor.cmd.PropertyChangeCommand;
 import org.talend.designer.core.ui.editor.properties.controllers.AbstractElementPropertySectionController;
 import org.talend.designer.core.ui.editor.properties.controllers.EmptyContextManager;
 import org.talend.designer.core.ui.editor.properties.controllers.GuessSchemaController;
-import org.talend.designer.core.ui.editor.properties.controllers.AbstractGuessSchemaController;
 
 /**
  * 
@@ -80,12 +76,12 @@ public class ButtonController extends AbstractElementPropertySectionController {
             loadJars(parameter);
         }
         if(button.getText() != null && button.getText().equals(GUESS_SCHEMA)){
-//            guessSchemaUtil.setCurParameter(parameter);
-//            if (part == null) {
-//                return guessSchemaUtil.createButtonCommand(button, new EmptyContextManager());
-//            } else {
-//                return guessSchemaUtil.createButtonCommand(button, part.getProcess().getContextManager());
-//            }
+            guessSchemaUtil.setCurParameter(parameter);
+            if (part == null) {
+                return guessSchemaUtil.createButtonCommand(button, new EmptyContextManager());
+            } else {
+                return guessSchemaUtil.createButtonCommand(button, part.getProcess().getContextManager());
+            }
         }
         if (parameter != null) {
             callBeforeActive(parameter);
