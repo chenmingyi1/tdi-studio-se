@@ -42,7 +42,7 @@ public class GenericTableUtils {
         for (String column : param.getListItemsDisplayCodeName()) {
             Property property = tableProperties.getValuedProperty(column);
             if (property.getValue() instanceof List) {
-                ((List) property.getValue()).clear();
+                property.setValue(new ArrayList<>());
             }
         }
         for (Map<String, String> line : table) {
