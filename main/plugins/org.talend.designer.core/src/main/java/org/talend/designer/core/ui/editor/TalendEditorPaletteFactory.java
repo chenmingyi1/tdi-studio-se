@@ -60,6 +60,7 @@ import org.talend.commons.exception.CommonExceptionHandler;
 import org.talend.commons.ui.gmf.util.DisplayUtils;
 import org.talend.commons.ui.runtime.image.ECoreImage;
 import org.talend.commons.ui.runtime.image.ImageProvider;
+import org.talend.core.GlobalServiceRegister;
 import org.talend.core.model.components.ComponentCategory;
 import org.talend.core.model.components.ComponentUtilities;
 import org.talend.core.model.components.EComponentType;
@@ -72,6 +73,7 @@ import org.talend.core.ui.component.TalendPaletteGroup;
 import org.talend.core.ui.component.settings.ComponentsSettingsHelper;
 import org.talend.designer.core.DesignerPlugin;
 import org.talend.designer.core.IPaletteFilter;
+import org.talend.designer.core.IUnifiedComponentService;
 import org.talend.designer.core.i18n.Messages;
 import org.talend.designer.core.model.components.ComponentHit;
 import org.talend.designer.core.model.process.AbstractProcessProvider;
@@ -473,7 +475,9 @@ public final class TalendEditorPaletteFactory {
                 }
             }
         } else if (compFac != null) {
-            componentSet = compFac.readComponents();
+            componentSet = new LinkedHashSet<IComponent>();
+            componentSet.addAll(compFac.readComponents());
+            addDelegateComponents(compFac, componentSet);
         }
 
         List<IComponent> relatedComponents = null;
@@ -582,6 +586,7 @@ public final class TalendEditorPaletteFactory {
 
         if (nameFilter != null && !nameFilter.trim().isEmpty()) {
             Collection<IComponent> components = compFac.readComponents();
+            addDelegateComponents(compFac, componentSet);
             Iterator<IComponent> iter = components.iterator();
             String regex = getFilterRegex(nameFilter);
             Pattern pattern = Pattern.compile(regex);
@@ -618,6 +623,14 @@ public final class TalendEditorPaletteFactory {
     private static void addComponents(Collection<IComponent> componentSet, ComponentHit[] hitArray) {
         for (ComponentHit ch : hitArray) {
             componentSet.add(ch.getComponent());
+        }
+    }
+
+    private static void addDelegateComponents(IComponentsFactory factory, Collection<IComponent> componentSet) {
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {
+            IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
+                    IUnifiedComponentService.class);
+            componentSet.addAll(service.getDelegateComponents(factory.getComponentsHandler().extractComponentsCategory().name()));
         }
     }
 
