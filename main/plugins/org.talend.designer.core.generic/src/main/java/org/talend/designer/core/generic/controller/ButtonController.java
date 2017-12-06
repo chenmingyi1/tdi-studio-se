@@ -32,8 +32,10 @@ import org.talend.commons.ui.runtime.image.ImageProvider;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.ILibraryManagerService;
+import org.talend.core.model.metadata.builder.connection.Connection;
 import org.talend.core.model.metadata.builder.database.ExtractMetaDataUtils;
 import org.talend.core.model.process.IElementParameter;
+import org.talend.core.model.properties.ConnectionItem;
 import org.talend.core.runtime.util.GenericTypeUtils;
 import org.talend.core.ui.CoreUIPlugin;
 import org.talend.core.ui.properties.tab.IDynamicProperty;
@@ -46,6 +48,8 @@ import org.talend.designer.core.ui.editor.cmd.PropertyChangeCommand;
 import org.talend.designer.core.ui.editor.properties.controllers.AbstractElementPropertySectionController;
 import org.talend.designer.core.ui.editor.properties.controllers.EmptyContextManager;
 import org.talend.designer.core.ui.editor.properties.controllers.GuessSchemaController;
+import org.talend.designer.core.ui.views.properties.composites.MissingSettingsMultiThreadDynamicComposite;
+import org.talend.metadata.managment.ui.utils.ConnectionContextHelper;
 
 /**
  * 
@@ -73,6 +77,7 @@ public class ButtonController extends AbstractElementPropertySectionController {
             return getGuessQueryCommand();
         }
         if(button.getText() != null && button.getText().equals(TEST_CONNECTION)){
+            chooseContext();
             loadJars(parameter);
         }
         if(button.getText() != null && button.getText().equals(GUESS_SCHEMA)){
@@ -89,6 +94,22 @@ public class ButtonController extends AbstractElementPropertySectionController {
             return new PropertyChangeCommand(elem, parameter.getName(), null);
         }
         return null;
+    }
+    
+    private void chooseContext(){
+        ConnectionItem connItem = null;
+        if(dynamicProperty instanceof MissingSettingsMultiThreadDynamicComposite){
+            connItem = ((MissingSettingsMultiThreadDynamicComposite)dynamicProperty).getConnectionItem();
+        }
+        if(connItem == null){
+            return;
+        }
+        Connection conn = connItem.getConnection();
+        if(!conn.isContextMode()){
+            return;
+        }
+        ConnectionContextHelper.context = ConnectionContextHelper.getContextTypeForContextMode(conn,
+                null, false);
     }
     
     private void loadJars(IElementParameter parameter){
@@ -164,6 +185,7 @@ public class ButtonController extends AbstractElementPropertySectionController {
             public void widgetSelected(SelectionEvent e) {
                 Command cmd = createCommand((Button) e.getSource());
                 executeCommand(cmd);
+                ConnectionContextHelper.context = null;
             }
         });
         Point initialSize = theBtn.computeSize(SWT.DEFAULT, SWT.DEFAULT);
