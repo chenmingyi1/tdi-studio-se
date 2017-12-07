@@ -190,7 +190,7 @@ public class DbInfo {
         ExtractMetaDataUtils extractMeta = ExtractMetaDataUtils.getInstance();
         try {
             List list = null;
-            if (dbType.equals(EDatabaseTypeName.GENERAL_JDBC.getDisplayName())) {
+            if (dbType.equals(EDatabaseTypeName.GENERAL_JDBC.getProduct())) {
                 list = extractMeta.connect(trueDBTypeForJDBC, url, username, pwd, driverClassName, driverJarPath, dbVersion,
                         additionalParams);
             } else {

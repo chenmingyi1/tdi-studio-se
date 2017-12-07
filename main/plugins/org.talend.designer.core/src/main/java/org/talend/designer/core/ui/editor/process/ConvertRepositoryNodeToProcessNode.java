@@ -76,7 +76,7 @@ public class ConvertRepositoryNodeToProcessNode {
         String url = iMetadataConnection.getUrl();
         String additionalParams = iMetadataConnection.getAdditionalParams();
 
-        if (EDatabaseTypeName.GENERAL_JDBC.getDisplayName().equals(dbType)) { // hywang for 9594
+        if (EDatabaseTypeName.GENERAL_JDBC.getProduct().equals(dbType)) { // hywang for 9594
             info = new DbInfo(dbType, username, pwd, dbVersion, url, iMetadataConnection.getDriverClass(),
                     iMetadataConnection.getDriverJarPath(), additionalParams);
         } else if (EDatabaseTypeName.HIVE.getDisplayName().equals(iMetadataConnection.getDbType())) {
