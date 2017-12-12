@@ -69,7 +69,7 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
 
             }
 
-            if ("schema".equals(namedThingName)) {
+            if ("schema".equals(namedThingName) && schmemaIsEmpty(currNamedThing)) {
 
                 // set input schema from input component OR empty schema
                 if (!allInputMainConnectors.isEmpty()) {
@@ -84,6 +84,10 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
                 }
             }
         }
+    }
+
+    private boolean schmemaIsEmpty(NamedThing schemaProperty) {
+        return ((Property<Schema>)schemaProperty).getValue().getFields().size() == 0;
     }
 
     private List<ConnectionType> getAllInputMainConnectors(NodeType nodeType) {
