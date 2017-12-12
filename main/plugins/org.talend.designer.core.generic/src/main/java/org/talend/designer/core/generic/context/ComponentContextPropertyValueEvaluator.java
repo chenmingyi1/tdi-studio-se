@@ -21,6 +21,7 @@ import org.talend.core.model.process.INode;
 import org.talend.core.model.process.IProcess;
 import org.talend.core.model.utils.ContextParameterUtils;
 import org.talend.core.runtime.evaluator.AbstractPropertyValueEvaluator;
+import org.talend.core.runtime.util.GenericTypeUtils;
 import org.talend.daikon.properties.property.Property;
 
 /**
@@ -38,6 +39,9 @@ public class ComponentContextPropertyValueEvaluator extends AbstractPropertyValu
     @Override
     public Object evaluate(Property property, Object storedValue) {
         if (storedValue == null) {
+            if(GenericTypeUtils.isBooleanType(property)){
+                return false;
+            }
             return storedValue;
         }
         if (storedValue instanceof Schema || storedValue instanceof Enum
