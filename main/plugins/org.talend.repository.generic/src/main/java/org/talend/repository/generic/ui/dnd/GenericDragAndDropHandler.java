@@ -380,7 +380,7 @@ public class GenericDragAndDropHandler extends AbstractDragAndDropServiceHandler
 
     private void setGenericRepositoryValue(Connection connection, INode node, IElementParameter param) {
         if (connection != null && param != null && param instanceof GenericElementParameter) {
-            if (connection.getCompProperties() == null) {
+            if ((connection.getCompProperties() == null) || connection.getCompProperties().length() <= 0) {
                 GenericElementParameter genericParam = (GenericElementParameter) param;
                 connection.setCompProperties(genericParam.getRootProperties().toSerialized());
             }

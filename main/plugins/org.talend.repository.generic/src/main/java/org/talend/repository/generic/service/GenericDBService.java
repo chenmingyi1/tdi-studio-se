@@ -102,10 +102,10 @@ public class GenericDBService implements IGenericDBService{
         if(!(item instanceof ConnectionItem)){
             return map;
         }
+        ConnectionItem gitem = (ConnectionItem) item;
+        Connection connection = (Connection) gitem.getConnection();
         ComponentWizard componentWizard = internalService.getComponentWizard(typeName, property.getId());;
         if(!isCreation && ((ConnectionItem)item).getConnection().getCompProperties() != null){
-            ConnectionItem gitem = (ConnectionItem) item;
-            Connection connection = (Connection) gitem.getConnection();
             ComponentProperties componentProperties = ComponentsUtils
                     .getComponentPropertiesFromSerialized(connection.getCompProperties(), connection);
             List<ComponentWizard> wizards = GenericWizardServiceFactory.getGenericWizardInternalService()
@@ -129,6 +129,24 @@ public class GenericDBService implements IGenericDBService{
                 baseElement,(ConnectionItem)property.getItem(), true, composite.getBackground(), forms.get(0), false);
         dynamicComposite.setLayoutData(createMainFormData(true));
         map.put("DynamicComposite", dynamicComposite);
+        
+        if(isCreation && ((ConnectionItem)item).getConnection().getCompProperties() != null){
+            ComponentProperties componentProperties = ComponentsUtils
+                    .getComponentPropertiesFromSerialized(connection.getCompProperties(), connection);
+            for(IElementParameter param : baseElement.getElementParameters()){
+                NamedThing thing = componentProperties.getProperty(param.getName());
+                if(thing == null){
+                    continue;
+                }
+                if(thing instanceof org.talend.daikon.properties.property.Property){
+                    param.setValue(ComponentsUtils.getParameterValue(baseElement, 
+                            (org.talend.daikon.properties.property.Property)thing, param.getFieldType(), param.getName()));
+                }else if(thing instanceof Properties){
+                    param.setValue(GenericTableUtils.getTableValues(((Properties)thing), param));
+                }
+            }
+            dynamicComposite.resetParameters();
+        }
 
         Composite contextParentComp = new Composite(composite, SWT.NONE);
         contextParentComp.setLayoutData(createFooterFormData(dynamicComposite));
@@ -266,6 +284,9 @@ public class GenericDBService implements IGenericDBService{
         if(!(connection instanceof DatabaseConnection)){
             return;
         }
+        if(props == null){
+            return;
+        }
         DatabaseConnection dbConnection = (DatabaseConnection) connection;
         for (NamedThing otherProp : props.getProperties()) {
             NamedThing thisProp = props.getProperty(otherProp.getName());
@@ -340,4 +361,13 @@ public class GenericDBService implements IGenericDBService{
         iTable = MetadataToolHelper.convert(table);
         return iTable;
     }
+
+    @Override
+    public void setPropertyTaggedValue(ComponentProperties properties) {
+        List<org.talend.daikon.properties.property.Property> propertyValues = ComponentsUtils.getAllValuedProperties(properties);
+        for (org.talend.daikon.properties.property.Property property : propertyValues) {
+            property.setTaggedValue(IGenericConstants.REPOSITORY_VALUE, property.getName());
+        }
+    }
+    
 }
