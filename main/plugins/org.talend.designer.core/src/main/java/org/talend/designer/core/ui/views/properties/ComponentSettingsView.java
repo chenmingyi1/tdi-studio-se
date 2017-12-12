@@ -547,13 +547,17 @@ public class ComponentSettingsView extends ViewPart implements IComponentSetting
         String label = null;
         Image image = null;
         if (elem instanceof Node) {
-            label = ((Node) elem).getLabel();
+            Node node = (Node) elem;
+            label = node.getLabel();
 
-            String uniqueName = ((Node) elem).getUniqueName();
+            String uniqueName = node.getUniqueName();
             if (!label.equals(uniqueName)) {
                 label = label + "(" + uniqueName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             }
-            image = CoreImageProvider.getComponentIcon(((Node) elem).getComponent(), ICON_SIZE.ICON_24);
+            if (node.getComponent() != node.getDelegateComponent()) {
+                label = node.getComponent().getName() + " - " + label;
+            }
+            image = CoreImageProvider.getComponentIcon(node.getDelegateComponent(), ICON_SIZE.ICON_24);
         } else if (elem instanceof Connection) {
             label = ((Connection) elem).getElementName();
             image = ImageProvider.getImage(EImage.RIGHT_ICON);

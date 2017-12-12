@@ -630,7 +630,21 @@ public final class TalendEditorPaletteFactory {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {
             IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
                     IUnifiedComponentService.class);
-            componentSet.addAll(service.getDelegateComponents(factory.getComponentsHandler().extractComponentsCategory().name()));
+            // filter unified components
+            Iterator<IComponent> iterator = componentSet.iterator();
+            while (iterator.hasNext()) {
+                IComponent next = iterator.next();
+                if (service.isUnifiedComponent(next)) {
+                    iterator.remove();
+                }
+            }
+
+            // add delegate components
+            String paletteType = ComponentCategory.CATEGORY_4_DI.getName();
+            if (factory.getComponentsHandler() != null) {
+                paletteType = factory.getComponentsHandler().extractComponentsCategory().getName();
+            }
+            componentSet.addAll(service.getDelegateComponents(paletteType));
         }
     }
 

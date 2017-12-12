@@ -1087,6 +1087,7 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
                 || param.getFieldType().equals(EParameterFieldType.SCHEMA_REFERENCE)
                 || param.getFieldType().equals(EParameterFieldType.PROPERTY_TYPE)
                 || param.getFieldType().equals(EParameterFieldType.VALIDATION_RULE_TYPE)
+                || param.getFieldType().equals(EParameterFieldType.UNIFIED_COMPONENTS)
                 || param.getName().equals(EParameterName.UPDATE_COMPONENTS.getName())) {
             return;
         }
@@ -1365,13 +1366,13 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
         }
 
     }
-    
-    protected boolean noNeedSetValue(IElementParameter param, String paraValue){
-        if(paraValue == null){
+
+    protected boolean noNeedSetValue(IElementParameter param, String paraValue) {
+        if (paraValue == null) {
             return true;
         }
-        for(IElementParameterDefaultValue defaultValue : param.getDefaultValues()){
-            if(defaultValue.getDefaultValue() != null &&  defaultValue.getDefaultValue().equals(paraValue)){
+        for (IElementParameterDefaultValue defaultValue : param.getDefaultValues()) {
+            if (defaultValue.getDefaultValue() != null && defaultValue.getDefaultValue().equals(paraValue)) {
                 return true;
             }
         }
@@ -4386,13 +4387,15 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
                         org.talend.core.model.metadata.builder.connection.Connection connection = null;
                         IElementParameter ptParam = elem.getElementParameterFromField(EParameterFieldType.PROPERTY_TYPE);
                         if (ptParam != null) {
-                            IElementParameter propertyElem = ptParam.getChildParameters().get(EParameterName.PROPERTY_TYPE.getName());
+                            IElementParameter propertyElem = ptParam.getChildParameters().get(
+                                    EParameterName.PROPERTY_TYPE.getName());
                             Object proValue = propertyElem.getValue();
                             if (proValue instanceof String && ((String) proValue).equalsIgnoreCase(EmfComponent.REPOSITORY)) {
-                                IElementParameter repositoryElem = ptParam.getChildParameters()
-                                        .get(EParameterName.REPOSITORY_PROPERTY_TYPE.getName());
+                                IElementParameter repositoryElem = ptParam.getChildParameters().get(
+                                        EParameterName.REPOSITORY_PROPERTY_TYPE.getName());
                                 String value = (String) repositoryElem.getValue();
-                                org.talend.core.model.properties.ConnectionItem connectionItem = UpdateRepositoryUtils.getConnectionItemByItemId(value);
+                                org.talend.core.model.properties.ConnectionItem connectionItem = UpdateRepositoryUtils
+                                        .getConnectionItemByItemId(value);
                                 connection = connectionItem.getConnection();
                                 if (connection != null && connection.isContextMode()) {
                                     addContextModel = true;
