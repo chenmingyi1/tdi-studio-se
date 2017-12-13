@@ -90,7 +90,7 @@ public class NodeFigure extends Figure {
     public NodeFigure(Node node) {
         this.node = node;
         fig = new ImageFigure();
-        fig.setImage(CoreImageProvider.getComponentIcon(node.getDelegateComponent(), ICON_SIZE.ICON_32));
+        fig.setImage(CoreImageProvider.getComponentIcon(node.getComponent(), ICON_SIZE.ICON_32));
         fig.setSize(new Dimension(Node.DEFAULT_SIZE, Node.DEFAULT_SIZE));
         add(fig);
 

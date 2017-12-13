@@ -35,6 +35,8 @@ public interface IUnifiedComponentService extends IService {
 
     public IComponent getDelegateComponent(IComponent component);
 
+    public IComponent getDelegateComponent(String componentName, String paletteType);
+
     public Collection<IComponent> getDelegateComponents(String componentCategory);
 
     public void createParameters(INode node, List<IElementParameter> listParams, IComponent delegateComp, IComponent emfComp);

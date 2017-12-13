@@ -66,6 +66,15 @@ public class UnifiedComponentUtil {
         return component;
     }
 
+    public static IComponent getDelegateComponent(String componentName, String paletteType) {
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {
+            IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
+                    IUnifiedComponentService.class);
+            return service.getDelegateComponent(componentName, paletteType);
+        }
+        return null;
+    }
+
     public static void createParameters(INode node, List<IElementParameter> listParams, IComponent delegateComp,
             IComponent emfComp) {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {

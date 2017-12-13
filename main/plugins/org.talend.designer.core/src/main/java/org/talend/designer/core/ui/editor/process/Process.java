@@ -178,6 +178,7 @@ import org.talend.designer.core.utils.DesignerUtilities;
 import org.talend.designer.core.utils.DetectContextVarsUtils;
 import org.talend.designer.core.utils.JavaProcessUtil;
 import org.talend.designer.core.utils.JobSettingVersionUtil;
+import org.talend.designer.core.utils.UnifiedComponentUtil;
 import org.talend.designer.core.utils.UpdateParameterUtils;
 import org.talend.designer.core.utils.ValidationRulesUtil;
 import org.talend.designer.runprocess.IRunProcessService;
@@ -2213,6 +2214,9 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
             listParamType = nType.getElementParameter();
             String componentName = nType.getComponentName();
             IComponent component = ComponentsFactoryProvider.getInstance().get(componentName, componentsType);
+            if (component == null) {
+                component = UnifiedComponentUtil.getDelegateComponent(componentName, componentsType);
+            }
             if (component != null) {
                 if (component.getComponentType() == EComponentType.JOBLET) {
                     if (!isCurrentProject && !componentName.contains(":")) { //$NON-NLS-1$

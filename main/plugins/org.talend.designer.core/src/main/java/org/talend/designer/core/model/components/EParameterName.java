@@ -372,7 +372,7 @@ public enum EParameterName {
     LEVENSHTEIN("LEVENSHTEIN"), //$NON-NLS-1$
     JACCARD("JACCARD"), //$NON-NLS-1$
 
-    UNIFIED_COMPONENTS("Components"),
+    UNIFIED_COMPONENTS("Database"),
 
     // for tDataprepRun
     PREPARATION_ID("PREPARATION_ID");
