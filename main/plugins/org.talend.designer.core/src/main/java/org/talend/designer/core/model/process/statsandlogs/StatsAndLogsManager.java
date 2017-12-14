@@ -42,6 +42,8 @@ import org.talend.core.model.utils.ContextParameterUtils;
 import org.talend.core.model.utils.TalendTextUtils;
 import org.talend.core.runtime.services.IGenericDBService;
 import org.talend.core.ui.component.ComponentsFactoryProvider;
+import org.talend.daikon.NamedThing;
+import org.talend.daikon.properties.presentation.Widget;
 import org.talend.designer.core.DesignerPlugin;
 import org.talend.designer.core.model.components.EParameterName;
 import org.talend.designer.core.model.components.ElementParameter;
@@ -323,7 +325,18 @@ public class StatsAndLogsManager {
             meterNode.setProcess(process);
             nodeList.add(meterNode);
         }
-
+        IElementParameter refPara = commitNode.getElementParameter("referencedComponent");
+        if(refPara != null){
+            refPara.setValue(connectionNode.getUniqueName());
+            IGenericDBService dbService = null;
+            if (GlobalServiceRegister.getDefault().isServiceRegistered(IGenericDBService.class)) {
+                dbService = (IGenericDBService) GlobalServiceRegister.getDefault().getService(
+                        IGenericDBService.class);
+            }
+            if(dbService != null){
+                dbService.initReferencedComponent(refPara, connectionNode.getUniqueName());
+            }
+        }
         return nodeList;
     }
 
@@ -450,13 +463,9 @@ public class StatsAndLogsManager {
         ((List<IConnection>) dataNode.getOutgoingConnections()).add(dataConnec);
         ((List<IConnection>) commitNode.getIncomingConnections()).add(dataConnec);
         
-        IElementParameter refPara = commitNode.getElementParameter("referencedComponent");
-        if(refPara != null){
-            refPara.setValue(connectionNode.getUniqueName());
-        }
         return connectionNode;
     }
-
+    
     /**
      * DOC zli Comment method "getUrl".
      *

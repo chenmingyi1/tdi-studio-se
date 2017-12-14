@@ -192,25 +192,27 @@ public class GenericElementParameter extends ElementParameter implements IGeneri
         }
 //        else if (widgetProperty instanceof ComponentReferenceProperties 
 //                && Widget.COMPONENT_REFERENCE_WIDGET_TYPE.equals(widget.getWidgetType())) {
+//            IElementParameter propertyParameter = this.getElement().
+//                    getElementParameterFromField(EParameterFieldType.PROPERTY_TYPE);
 //            ComponentReferenceProperties props = (ComponentReferenceProperties)widgetProperty;
 //            if(newValue == null || newValue.toString().length() <= 0){
 //                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
 //                props.componentInstanceId.setValue(null);
 //                props.setReference(null);
+//                propertyParameter.setShow(true);
 //            }else{
 //                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
 //                props.componentInstanceId.setValue(newValue);
 //                if (this.getElement() != null && props.referenceDefinitionName != null
 //                        && props.referenceDefinitionName.getStringValue() != null && this.getElement() instanceof INode) {
 //                    INode node = (INode) this.getElement();
-//                    List<INode> refNodes = (List<INode>) node.getProcess().getNodesOfType(
-//                            props.referenceDefinitionName.getStringValue());
-//                    for (INode refNode : refNodes) {
-//                        if (refNode.getUniqueName() != null && refNode.getUniqueName().equals(newValue)) {
+//                    for(INode refNode : node.getProcess().getGraphicalNodes()){
+//                        if(refNode.getUniqueName().equals(newValue)){
 //                            props.setReference(refNode.getComponentProperties());
 //                        }
 //                    }
 //                }
+//                propertyParameter.setShow(false);
 //            }
 //            
 //        }

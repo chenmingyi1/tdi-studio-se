@@ -1810,6 +1810,22 @@ public class DataProcess implements IGeneratingProcess {
                 buildCheckMap.put(node, node);
                 addDataNode(node);
                 replaceMultipleComponents(node);
+                for(INode dataNode : dataNodeList){
+                    if(dataNode.getUniqueName().equals(node.getUniqueName()+"_DB")){
+                        IElementParameter refPara = dataNode.getElementParameter("referencedComponent");
+                        if(refPara != null){
+                            refPara.setValue("connectionStatsLogs");
+                            IGenericDBService dbService = null;
+                            if (GlobalServiceRegister.getDefault().isServiceRegistered(IGenericDBService.class)) {
+                                dbService = (IGenericDBService) GlobalServiceRegister.getDefault().getService(
+                                        IGenericDBService.class);
+                            }
+                            if(dbService != null){
+                                dbService.initReferencedComponent(refPara, "connectionStatsLogs");
+                            }
+                        }
+                    }
+                }
             }
         }
 

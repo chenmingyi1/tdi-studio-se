@@ -37,6 +37,7 @@ import org.talend.components.api.component.ComponentDefinition;
 import org.talend.components.api.component.Connector;
 import org.talend.components.api.component.PropertyPathConnector;
 import org.talend.components.api.properties.ComponentProperties;
+import org.talend.components.api.properties.ComponentReferenceProperties;
 import org.talend.components.api.service.ComponentService;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.components.IComponentsFactory;
@@ -815,5 +816,53 @@ public class ComponentsUtils {
             }
         }
         return nals;
+    }
+    
+    public static void initReferencedComponent(IElementParameter refPara, String newValue){
+
+        if(!(refPara instanceof GenericElementParameter)){
+            return;
+        }
+        Widget widget = ((GenericElementParameter)refPara).getWidget();
+        NamedThing widgetProperty = widget.getContent();
+        if (widgetProperty instanceof ComponentReferenceProperties 
+                && Widget.COMPONENT_REFERENCE_WIDGET_TYPE.equals(widget.getWidgetType())) {
+            IElementParameter propertyParameter = refPara.getElement().
+                    getElementParameterFromField(EParameterFieldType.PROPERTY_TYPE);
+            ComponentReferenceProperties props = (ComponentReferenceProperties)widgetProperty;
+            if(newValue == null || newValue.toString().length() <= 0){
+                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.THIS_COMPONENT);
+                props.componentInstanceId.setValue(null);
+                props.setReference(null);
+                propertyParameter.setShow(true);
+            }else{
+                props.referenceType.setValue(ComponentReferenceProperties.ReferenceType.COMPONENT_INSTANCE);
+                props.componentInstanceId.setValue(newValue);
+                if (refPara.getElement() != null && refPara.getElement() instanceof INode) {
+                    INode node = (INode) refPara.getElement();
+                    for(INode refNode : node.getProcess().getGraphicalNodes()){
+                        if(refNode.getUniqueName().equals(newValue)){
+                            props.setReference(refNode.getComponentProperties());
+                        }
+                    }
+                }
+                propertyParameter.setShow(false);
+            }
+        }
+        IElementParameter parent = refPara.getParentParameter();
+        Widget parentWidget = null;
+        if(parent != null){
+            parentWidget = ((GenericElementParameter)parent).getWidget();
+        }
+        for(IElementParameter param : refPara.getElement().getElementParameters()){
+            if(param instanceof GenericElementParameter){
+                widget.setHidden();
+                if(param.getName().startsWith("connection")){
+                    param.setShow(false);
+                    continue;
+                }
+                param.setShow(parentWidget == null ? !widget.isHidden() : !parentWidget.isHidden() && !widget.isHidden());
+            }
+        }
     }
 }
