@@ -12,6 +12,7 @@
 // ============================================================================
 package org.talend.designer.core.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.talend.core.GlobalServiceRegister;
@@ -19,6 +20,8 @@ import org.talend.core.model.components.IComponent;
 import org.talend.core.model.components.IComponentsService;
 import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.INode;
+import org.talend.core.model.utils.IComponentName;
+import org.talend.core.repository.RepositoryComponentSetting;
 import org.talend.designer.core.IUnifiedComponentService;
 import org.talend.designer.core.model.components.EParameterName;
 import org.talend.designer.core.ui.editor.nodes.Node;
@@ -91,6 +94,58 @@ public class UnifiedComponentUtil {
             service.switchComponent(node, delegateComponent, oldParms);
         }
 
+    }
+
+    public static List<IComponent> filterUnifiedComponent(RepositoryComponentSetting setting, List<IComponent> componentList) {
+        if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {
+            List<IComponent> filtedList = new ArrayList<IComponent>();
+            IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
+                    IUnifiedComponentService.class);
+            for (IComponent component : componentList) {
+                IComponent delegateComponent = service.getDelegateComponent(component);
+                if (delegateComponent != null && !filtedList.contains(delegateComponent)) {
+                    if (component.getName().equals(setting.getInputComponent())) {
+                        setting.setInputComponent(delegateComponent.getName());
+                    }
+                    if (component.getName().equals(setting.getOutputComponent())) {
+                        setting.setOutputComponent(delegateComponent.getName());
+                    }
+                    if (component.getName().equals(setting.getDefaultComponent())) {
+                        setting.setDefaultComponent(delegateComponent.getName());
+                    }
+                    filtedList.add(delegateComponent);
+                } else {
+                    filtedList.add(component);
+                }
+            }
+            return filtedList;
+        }
+        return componentList;
+    }
+
+    public static IComponent getEmfComponent(IComponentName setting, IComponent selectedComponent) {
+        if (isDelegateComponent(selectedComponent)) {
+            IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
+                    IUnifiedComponentService.class);
+            String paletteType = selectedComponent.getPaletteType();
+            String unifiedCompName = service.getUnifiedComponetByDatabaseName(setting, selectedComponent);
+            IComponentsService compService = (IComponentsService) GlobalServiceRegister.getDefault().getService(
+                    IComponentsService.class);
+            IComponent emfComponent = compService.getComponentsFactory().get(unifiedCompName, paletteType);
+            if (emfComponent != null) {
+                return emfComponent;
+            }
+        }
+        return selectedComponent;
+    }
+
+    public static String getUnifiedCompDisplayName(IComponent delegateComponent, String emfComponent) {
+        if (isDelegateComponent(delegateComponent)) {
+            IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
+                    IUnifiedComponentService.class);
+            return service.getUnifiedCompDisplayName(delegateComponent, emfComponent);
+        }
+        return null;
     }
 
 }

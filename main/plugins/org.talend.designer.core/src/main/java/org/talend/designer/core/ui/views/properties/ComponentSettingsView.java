@@ -82,6 +82,7 @@ import org.talend.designer.core.ui.editor.subjobcontainer.SubjobContainer;
 import org.talend.designer.core.ui.preferences.TalendDesignerPrefConstants;
 import org.talend.designer.core.ui.views.properties.composites.MissingSettingsMultiThreadDynamicComposite;
 import org.talend.designer.core.ui.views.subjob.SubjobBasicComposite;
+import org.talend.designer.core.utils.UnifiedComponentUtil;
 import org.talend.repository.RepositoryPlugin;
 
 /**
@@ -555,7 +556,11 @@ public class ComponentSettingsView extends ViewPart implements IComponentSetting
                 label = label + "(" + uniqueName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             }
             if (node.getComponent() != node.getDelegateComponent()) {
-                label = node.getComponent().getName() + " - " + label;
+                String dispalyName = UnifiedComponentUtil.getUnifiedCompDisplayName(node.getDelegateComponent(), node
+                        .getComponent().getName());
+                if (dispalyName != null) {
+                    label = label + "(" + dispalyName + ")";
+                }
             }
             image = CoreImageProvider.getComponentIcon(node.getDelegateComponent(), ICON_SIZE.ICON_24);
         } else if (elem instanceof Connection) {

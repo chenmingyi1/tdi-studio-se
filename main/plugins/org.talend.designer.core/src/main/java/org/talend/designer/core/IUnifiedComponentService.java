@@ -7,6 +7,7 @@ import org.talend.core.IService;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.INode;
+import org.talend.core.model.utils.IComponentName;
 
 // ============================================================================
 //
@@ -31,15 +32,49 @@ public interface IUnifiedComponentService extends IService {
 
     public boolean isUnifiedComponent(IComponent component);
 
-    public String[] getUnifiedComponents(IComponent delegateComponet);
+    /**
+     * 
+     * This function is used for drag&drop items from repository
+     * 
+     * @param setting
+     * @param selectedComponent
+     * @return
+     */
+    public String getUnifiedComponetByDatabaseName(IComponentName setting, IComponent selectedComponent);
 
+    /**
+     * 
+     * Get the delegate component
+     * 
+     * @param component
+     * @return
+     */
     public IComponent getDelegateComponent(IComponent component);
 
-    public IComponent getDelegateComponent(String componentName, String paletteType);
+    /**
+     * 
+     * Get the delegate component from name
+     * 
+     * @param delegateCompName
+     * @param paletteType
+     * @return
+     */
+    public IComponent getDelegateComponent(String delegateCompName, String paletteType);
 
-    public Collection<IComponent> getDelegateComponents(String componentCategory);
+    public Collection<IComponent> getDelegateComponents(String paletteType);
 
+    /**
+     * 
+     * Create parameters for delegate component
+     * 
+     * @param node
+     * @param listParams
+     * @param delegateComp
+     * @param emfComp
+     */
     public void createParameters(INode node, List<IElementParameter> listParams, IComponent delegateComp, IComponent emfComp);
 
     public void switchComponent(INode node, IComponent delegateComponent, List<? extends IElementParameter> oldParms);
+
+    public String getUnifiedCompDisplayName(IComponent delegateComponent, String emfComponent);
 }

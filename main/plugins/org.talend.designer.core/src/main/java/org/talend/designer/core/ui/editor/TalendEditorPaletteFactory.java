@@ -84,6 +84,7 @@ import org.talend.designer.core.ui.editor.palette.TalendCombinedTemplateCreation
 import org.talend.designer.core.ui.editor.palette.TalendPaletteDrawer;
 import org.talend.designer.core.ui.preferences.PaletteSettingsPreferencePage;
 import org.talend.designer.core.ui.preferences.TalendDesignerPrefConstants;
+import org.talend.designer.core.utils.UnifiedComponentUtil;
 
 /**
  * This class creates the palette in the Gef Editor. <br/>
@@ -419,6 +420,12 @@ public final class TalendEditorPaletteFactory {
                         componentSet.addAll(filteredComponent);
                     }
                 }
+                for (IComponent component : componentSet) {
+                    IComponent delegateComponent = UnifiedComponentUtil.getDelegateComponent(component);
+                    if (delegateComponent != null) {
+                        componentSet.add(delegateComponent);
+                    }
+                }
             }
             // 2. do usual search
             if (componentNameMap != null) {
@@ -585,8 +592,8 @@ public final class TalendEditorPaletteFactory {
         }
 
         if (nameFilter != null && !nameFilter.trim().isEmpty()) {
-            Collection<IComponent> components = compFac.readComponents();
-            addDelegateComponents(compFac, componentSet);
+            List<IComponent> components = new ArrayList<IComponent>(compFac.readComponents());
+            addDelegateComponents(compFac, components);
             Iterator<IComponent> iter = components.iterator();
             String regex = getFilterRegex(nameFilter);
             Pattern pattern = Pattern.compile(regex);
@@ -622,7 +629,8 @@ public final class TalendEditorPaletteFactory {
 
     private static void addComponents(Collection<IComponent> componentSet, ComponentHit[] hitArray) {
         for (ComponentHit ch : hitArray) {
-            componentSet.add(ch.getComponent());
+            IComponent component = ch.getComponent();
+            componentSet.add(component);
         }
     }
 
