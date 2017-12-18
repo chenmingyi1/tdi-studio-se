@@ -121,9 +121,6 @@ public class OAuthStrategyImpl implements IAuthStrategy {
         if(conf.getAppRegisteredType() == ClientConfiguration.AppRegisteredType.NATIVE_APP){
             future = context.acquireToken(conf.getResource(), conf.getClientId(), conf.getUserName(), conf.getPassword(), null);
         }
-        else if(conf.getAppRegisteredType() == ClientConfiguration.AppRegisteredType.WEB_APP && conf.getWebAppPermission() == ClientConfiguration.WebAppPermission.APPLICATION){
-            future = context.acquireToken(conf.getResource(), new ClientCredential(conf.getClientId(), conf.getClientSecret()),null);
-        }
         else if(conf.getAppRegisteredType() == ClientConfiguration.AppRegisteredType.WEB_APP && conf.getWebAppPermission() == ClientConfiguration.WebAppPermission.DELEGATED){
             future = context.acquireToken(conf.getResource(), new ClientCredential(conf.getClientId(), conf.getClientSecret()), conf.getUserName(), conf.getPassword(), null);
         }
