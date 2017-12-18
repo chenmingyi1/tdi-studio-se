@@ -562,7 +562,7 @@ public class ComponentSettingsView extends ViewPart implements IComponentSetting
                     label = label + "(" + dispalyName + ")";
                 }
             }
-            image = CoreImageProvider.getComponentIcon(node.getDelegateComponent(), ICON_SIZE.ICON_24);
+            image = CoreImageProvider.getComponentIcon(node.getComponent(), ICON_SIZE.ICON_24);
         } else if (elem instanceof Connection) {
             label = ((Connection) elem).getElementName();
             image = ImageProvider.getImage(EImage.RIGHT_ICON);

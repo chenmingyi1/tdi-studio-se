@@ -40,7 +40,7 @@ public interface IUnifiedComponentService extends IService {
      * @param selectedComponent
      * @return
      */
-    public String getUnifiedComponetByDatabaseName(IComponentName setting, IComponent selectedComponent);
+    public String getUnifiedComponetName4DndFromRepository(IComponentName setting, IComponent selectedComponent);
 
     /**
      * 

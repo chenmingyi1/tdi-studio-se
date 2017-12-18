@@ -15,6 +15,7 @@ package org.talend.designer.core.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.ui.PlatformUI;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.components.IComponentsService;
@@ -25,6 +26,7 @@ import org.talend.core.repository.RepositoryComponentSetting;
 import org.talend.designer.core.IUnifiedComponentService;
 import org.talend.designer.core.model.components.EParameterName;
 import org.talend.designer.core.ui.editor.nodes.Node;
+import org.talend.designer.core.ui.views.properties.ComponentSettingsView;
 
 /**
  * created by wchen on Dec 11, 2017 Detailled comment
@@ -128,7 +130,7 @@ public class UnifiedComponentUtil {
             IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
                     IUnifiedComponentService.class);
             String paletteType = selectedComponent.getPaletteType();
-            String unifiedCompName = service.getUnifiedComponetByDatabaseName(setting, selectedComponent);
+            String unifiedCompName = service.getUnifiedComponetName4DndFromRepository(setting, selectedComponent);
             IComponentsService compService = (IComponentsService) GlobalServiceRegister.getDefault().getService(
                     IComponentsService.class);
             IComponent emfComponent = compService.getComponentsFactory().get(unifiedCompName, paletteType);
@@ -148,4 +150,11 @@ public class UnifiedComponentUtil {
         return null;
     }
 
+    public static void refreshComponentViewTitle() {
+        ComponentSettingsView viewer = (ComponentSettingsView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().findView(ComponentSettingsView.ID);
+        if (viewer != null) {
+            viewer.updatePropertiesViewerTitle();
+        }
+    }
 }
