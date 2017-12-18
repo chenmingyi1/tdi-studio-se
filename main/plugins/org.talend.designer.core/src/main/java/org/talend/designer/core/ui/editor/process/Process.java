@@ -123,6 +123,8 @@ import org.talend.core.model.utils.TalendTextUtils;
 import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.repository.utils.ConvertJobsUtil;
 import org.talend.core.repository.utils.XmiResourceManager;
+import org.talend.core.runtime.repository.item.ItemProductKeys;
+import org.talend.core.runtime.util.ItemDateParser;
 import org.talend.core.service.IScdComponentService;
 import org.talend.core.ui.IJobletProviderService;
 import org.talend.core.ui.ILastVersionChecker;
@@ -293,6 +295,7 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
         updateManager = new ProcessUpdateManager(this);
         createProcessParameters();
         init();
+        loadAdditionalProperties();
         componentsType = ComponentCategory.CATEGORY_4_DI.getName();
     }
 
@@ -1530,7 +1533,11 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
                     }
                 }
 
-                if (generic) {
+                Object sourceName = null;
+                if (param instanceof ElementParameter) {
+                    sourceName = ((ElementParameter) param).getTaggedValue("org.talend.sdk.component.source");
+                }
+                if (generic && !"tacokit".equalsIgnoreCase(String.valueOf(sourceName))) {
                     param.setValue(value);
                 } else {
                     param.setValue(pType.getRawValue());
@@ -3490,7 +3497,7 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
     // PTODO mhelleboid remove
     @Override
     public Date getCreationDate() {
-        return getProperty().getCreationDate();
+        return ItemDateParser.parseAdditionalDate(additionalProperties, ItemProductKeys.DATE.getCreatedKey());
     }
 
     @Override
@@ -3500,7 +3507,7 @@ public class Process extends Element implements IProcess2, IGEFProcess, ILastVer
 
     @Override
     public Date getModificationDate() {
-        return getProperty().getModificationDate();
+        return ItemDateParser.parseAdditionalDate(additionalProperties, ItemProductKeys.DATE.getModifiedKey());
     }
 
     @Override
