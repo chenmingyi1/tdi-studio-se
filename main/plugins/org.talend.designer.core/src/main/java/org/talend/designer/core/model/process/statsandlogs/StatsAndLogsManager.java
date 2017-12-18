@@ -27,6 +27,7 @@ import org.talend.core.database.conn.DatabaseConnStrUtil;
 import org.talend.core.language.ECodeLanguage;
 import org.talend.core.language.LanguageManager;
 import org.talend.core.model.components.ComponentCategory;
+import org.talend.core.model.components.EComponentType;
 import org.talend.core.model.components.IComponent;
 import org.talend.core.model.general.ModuleNeeded;
 import org.talend.core.model.metadata.IMetadataTable;
@@ -183,11 +184,18 @@ public class StatsAndLogsManager {
                         commitNode = new DataNode(commitComponent, connectionUID2);
                         commitNode.setSubProcessStart(true);
                         commitNode.setActivate(true);
+                        boolean isGeneric = commitNode.getComponent().getComponentType() == EComponentType.GENERIC;
                         IElementParameter param = commitNode.getElementParameter(EParameterName.CONNECTION.getName());
+                        if(param == null && isGeneric){
+                            param = commitNode.getElementParameter("referencedComponent"); //$NON-NLS-1$
+                        }
                         if (param != null) {
                             param.setValue(CONNECTION_UID);
                         }
-                        IElementParameter elementParameter = commitNode.getElementParameter("CLOSE");
+                        IElementParameter elementParameter = commitNode.getElementParameter("CLOSE");//$NON-NLS-1$
+                        if(elementParameter == null && isGeneric){
+                            elementParameter = commitNode.getElementParameter("closeConnection");//$NON-NLS-1$
+                        }
                         if (elementParameter != null) {
                             elementParameter.setValue(Boolean.FALSE);
                         }
@@ -409,26 +417,36 @@ public class StatsAndLogsManager {
                         connectionNode = new DataNode(component, connectionUID);
                         connectionNode.setSubProcessStart(true);
                         connectionNode.setActivate(true);
+                        boolean isGeneric = connectionNode.getComponent().getComponentType() == EComponentType.GENERIC;
                         // check if shared parameter exist, if yes, use it ONLY when use the project settings.
                         // name for shared connection can be always the same, as we use only when project settings is
                         // activated.
                         IElementParameter elementParameter = connectionNode
                                 .getElementParameter(EParameterName.USE_SHARED_CONNECTION.getName());
-
+                        if(elementParameter == null && isGeneric){
+                            elementParameter = connectionNode
+                                    .getElementParameter("shareConnection"); //$NON-NLS-1$
+                        }
                         if (elementParameter != null && elementParameter.getName() != null) {
                             elementParameter.setValue(Boolean.TRUE);
                             final String sharedConnName = "StatsAndLog_Shared_Connection"; //$NON-NLS-1$
+                            IElementParameter sharedElementParameter = connectionNode.
+                                    getElementParameter(EParameterName.SHARED_CONNECTION_NAME.getName());
+                            if(sharedElementParameter == null && isGeneric){
+                                sharedElementParameter = connectionNode.
+                                        getElementParameter("sharedConnectionName"); //$NON-NLS-1$
+                            }
                             if ((Boolean) process.getElementParameter(EParameterName.STATANDLOG_USE_PROJECT_SETTINGS.getName())
                                     .getValue()) {
-                                connectionNode.getElementParameter(EParameterName.SHARED_CONNECTION_NAME.getName()).setValue(
+                                sharedElementParameter.setValue(
                                         TalendTextUtils.addQuotes(sharedConnName));
                             } else {
                                 String url = getUrl(process);
                                 if (url == null || url.equals("")) { // fix bug of stats/logs found for sybase
-                                    connectionNode.getElementParameter(EParameterName.SHARED_CONNECTION_NAME.getName()).setValue(
+                                    sharedElementParameter.setValue(
                                             TalendTextUtils.addQuotes(sharedConnName));
                                 } else {
-                                    connectionNode.getElementParameter(EParameterName.SHARED_CONNECTION_NAME.getName()).setValue(
+                                    sharedElementParameter.setValue(
                                             url + "+" + TalendTextUtils.addQuotes("_" + sharedConnName)); //$NON-NLS-1$ //$NON-NLS-2$
                                 }
                             }
