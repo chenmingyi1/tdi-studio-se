@@ -46,8 +46,6 @@ import org.talend.designer.core.generic.model.GenericElementParameter;
 import org.talend.designer.core.generic.model.GenericTableUtils;
 import org.talend.designer.core.ui.editor.cmd.PropertyChangeCommand;
 import org.talend.designer.core.ui.editor.properties.controllers.AbstractElementPropertySectionController;
-import org.talend.designer.core.ui.editor.properties.controllers.EmptyContextManager;
-import org.talend.designer.core.ui.editor.properties.controllers.GuessSchemaController;
 import org.talend.designer.core.ui.views.properties.composites.MissingSettingsMultiThreadDynamicComposite;
 import org.talend.metadata.managment.ui.utils.ConnectionContextHelper;
 
@@ -58,36 +56,19 @@ import org.talend.metadata.managment.ui.utils.ConnectionContextHelper;
  */
 public class ButtonController extends AbstractElementPropertySectionController {
     
-    private static final String GUESS_QUERY_NAME = "Guess Query"; //$NON-NLS-1$
-    
-    private static final String GUESS_SCHEMA = "Guess schema"; //$NON-NLS-1$
-    
     private static final String TEST_CONNECTION = "Test connection"; //$NON-NLS-1$
     
-    private GuessSchemaController guessSchemaUtil = null;
-
     public ButtonController(IDynamicProperty dp) {
         super(dp);
-        guessSchemaUtil = new GuessSchemaController(dp);
     }
 
     public Command createCommand(Button button) {
         IElementParameter parameter = (IElementParameter) button.getData();
-        if (button.getText() != null && button.getText().equals(GUESS_QUERY_NAME)) {
-            return getGuessQueryCommand();
-        }
         if(button.getText() != null && button.getText().equals(TEST_CONNECTION)){
             chooseContext();
             loadJars(parameter);
         }
-        if(button.getText() != null && button.getText().equals(GUESS_SCHEMA)){
-            guessSchemaUtil.setCurParameter(parameter);
-            if (part == null) {
-                return guessSchemaUtil.createButtonCommand(button, new EmptyContextManager());
-            } else {
-                return guessSchemaUtil.createButtonCommand(button, part.getProcess().getContextManager());
-            }
-        }
+        
         if (parameter != null) {
             callBeforeActive(parameter);
             // so as to invoke listeners to perform some actions.
