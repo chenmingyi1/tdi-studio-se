@@ -102,9 +102,9 @@
             <version>4.12</version>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.azure</groupId>
+	    <groupId>org.talend.libraries</groupId>
             <artifactId>adal4j</artifactId>
-            <version>1.1.2-talend</version>
+            <version>1.1.1-patch</version>
         </dependency>
 	</dependencies>
 	<build>
