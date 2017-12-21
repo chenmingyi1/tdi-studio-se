@@ -1,5 +1,8 @@
 package org.talend.designer.core.utils;
 
+import java.util.List;
+import java.util.Map;
+
 import org.talend.core.model.process.EConnectionType;
 import org.talend.core.model.process.IConnection;
 import org.talend.core.model.process.IConnectionCategory;
@@ -74,5 +77,27 @@ public class ConnectionUtil {
          */
         // return conn.getName();
 
+    }
+    
+    public static void resetDriverValue(Object repValue){
+        if(repValue instanceof List){
+            List lines = (List) repValue;
+            for(Object obj: lines){
+                if(!(obj instanceof Map)){
+                    continue;
+                }
+                Map line = (Map) obj;
+                Object value = line.get("drivers");
+                if(value == null){
+                    continue;
+                }
+                if(value instanceof String){
+                    if(((String)value).contains("/")){
+                        line.put("drivers", ((String)value).split("/")[1]+".jar");
+                    }
+                    
+                }
+            }
+        }
     }
 }

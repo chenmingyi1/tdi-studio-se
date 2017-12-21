@@ -100,6 +100,7 @@ import org.talend.designer.core.ui.editor.connections.Connection;
 import org.talend.designer.core.ui.editor.nodecontainer.NodeContainer;
 import org.talend.designer.core.ui.editor.nodes.Node;
 import org.talend.designer.core.ui.editor.process.Process;
+import org.talend.designer.core.utils.ConnectionUtil;
 import org.talend.designer.core.utils.JavaProcessUtil;
 import org.talend.designer.core.utils.ValidationRulesUtil;
 import org.talend.repository.model.IProxyRepositoryFactory;
@@ -1806,22 +1807,37 @@ public class DataProcess implements IGeneratingProcess {
             }
 
             List<DataNode> statsAndLogsNodeList = JobSettingsManager.createStatsAndLogsNodes(duplicatedProcess);
+            DataNode connNode = null;
+            for (DataNode node : statsAndLogsNodeList) {
+                if(node.getUniqueName().equals(StatsAndLogsManager.CONNECTION_UID)){
+                    connNode = node;
+                    IElementParameter parameter = connNode.getElementParameter("connection.driverTable");
+                    if(parameter != null){
+                        Object repValue = parameter.getValue();
+                        ConnectionUtil.resetDriverValue(repValue);
+                    }
+                    break;
+                }
+            }
             for (DataNode node : statsAndLogsNodeList) {
                 buildCheckMap.put(node, node);
                 addDataNode(node);
                 replaceMultipleComponents(node);
+                if(connNode == null){
+                    continue;
+                }
                 for(INode dataNode : dataNodeList){
                     if(dataNode.getUniqueName().equals(node.getUniqueName()+"_DB")){
                         IElementParameter refPara = dataNode.getElementParameter("referencedComponent");
                         if(refPara != null){
-                            refPara.setValue("connectionStatsLogs");
+                            refPara.setValue(connNode.getUniqueName());
                             IGenericDBService dbService = null;
                             if (GlobalServiceRegister.getDefault().isServiceRegistered(IGenericDBService.class)) {
                                 dbService = (IGenericDBService) GlobalServiceRegister.getDefault().getService(
                                         IGenericDBService.class);
                             }
                             if(dbService != null){
-                                dbService.initReferencedComponent(refPara, "connectionStatsLogs");
+                                dbService.initReferencedComponent(refPara, connNode.getUniqueName());
                             }
                         }
                     }

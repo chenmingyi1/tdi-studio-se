@@ -119,6 +119,7 @@ import org.talend.designer.core.model.utils.emf.talendfile.ContextType;
 import org.talend.designer.core.ui.editor.nodes.Node;
 import org.talend.designer.core.ui.editor.update.UpdateCheckResult;
 import org.talend.designer.core.ui.editor.update.UpdateManagerUtils;
+import org.talend.designer.core.utils.ConnectionUtil;
 import org.talend.designer.core.utils.SAPParametersUtils;
 import org.talend.metadata.managment.ui.utils.ConnectionContextHelper;
 import org.talend.repository.UpdateRepositoryUtils;
@@ -817,6 +818,9 @@ public class ProcessUpdateManager extends AbstractUpdateManager {
                                             repositoryValue, null);
                                     if (repValue == null) {
                                         continue;
+                                    }
+                                    if(repositoryValue.equals("connection.driverTable")){
+                                        ConnectionUtil.resetDriverValue(repValue);
                                     }
                                     if (repositoryValue.equals(UpdatesConstants.TYPE)) { // datebase type
                                         boolean found = false;
