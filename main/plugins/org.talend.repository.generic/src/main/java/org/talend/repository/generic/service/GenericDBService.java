@@ -323,14 +323,12 @@ public class GenericDBService implements IGenericDBService{
     }
 
     @Override
-    public String getMVNPath(IElementParameter tableParam, String value) {
-        if(tableParam.getName().equals(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName())){
-            ModuleNeeded module = new ModuleNeeded("", value, "", true);//$NON-NLS-1$ //$NON-NLS-2$
-            String mvnPath = module.getMavenUri();
-            if(mvnPath != null && mvnPath.endsWith("/jar")){//$NON-NLS-1$
-                mvnPath = mvnPath.substring(0, mvnPath.lastIndexOf("/"));//$NON-NLS-1$
-                return TalendQuoteUtils.addQuotesIfNotExist(mvnPath);
-            }
+    public String getMVNPath(String value) {
+        ModuleNeeded module = new ModuleNeeded("", value, "", true);//$NON-NLS-1$ //$NON-NLS-2$
+        String mvnPath = module.getMavenUri();
+        if(mvnPath != null && mvnPath.endsWith("/jar")){//$NON-NLS-1$
+            mvnPath = mvnPath.substring(0, mvnPath.lastIndexOf("/"));//$NON-NLS-1$
+            return TalendQuoteUtils.addQuotesIfNotExist(mvnPath);
         }
         return value;
     }
@@ -376,6 +374,14 @@ public class GenericDBService implements IGenericDBService{
     @Override
     public void initReferencedComponent(IElementParameter refPara, String newValue){
         ComponentsUtils.initReferencedComponent(refPara, newValue);
+    }
+
+    @Override
+    public Properties getComponentProperties(String typeName, String id) {
+        IGenericWizardInternalService internalService = new GenericWizardInternalService();
+        ComponentWizard componentWizard = internalService.getComponentWizard(typeName, id);
+        List<Form> forms = componentWizard.getForms();
+        return forms.get(0).getProperties();
     }
     
 }

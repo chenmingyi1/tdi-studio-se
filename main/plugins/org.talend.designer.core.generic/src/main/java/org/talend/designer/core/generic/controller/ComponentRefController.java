@@ -96,7 +96,7 @@ public class ComponentRefController extends AbstractElementPropertySectionContro
                         boolean done = false;
                         for (int i = 0; i < params.size() && !done; i++) {
                             IElementParameter param = params.get(i);
-                            if (param.getName().equals(name)) {//name = referencedComponent
+                            if (param.getName().equals(name)) {
                                 for (int j = 0; j < param.getListItemsValue().length; j++) {
                                     if (((CCombo) ctrl).getText().equals(param.getListItemsDisplayName()[j])) {
                                         value = (String) param.getListItemsValue()[j];

@@ -58,7 +58,9 @@ public class GenericTableUtils {
                 List<String> valueList = new ArrayList<>();
                 if(dbService != null){
                     for(String v:values){
-                        v = dbService.getMVNPath(param, v);
+                        if(param.getName().equals(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName())){
+                            v = dbService.getMVNPath(v);
+                        }
                         valueList.add(v);
                     }
                     property.setValue(valueList);

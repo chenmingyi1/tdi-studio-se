@@ -736,7 +736,9 @@ public class StatsAndLogsManager {
                 if(obj instanceof Map){
                     Map map = (Map) obj;
                     String driver = (String) map.get("drivers");
-                    driver = dbService.getMVNPath(elePara, driver);
+                    if(elePara.getName().equals(EConnectionParameterName.GENERIC_DRIVER_JAR.getDisplayName())){
+                        driver = dbService.getMVNPath(driver);
+                    }
                     map.put("drivers", driver);
                 }
             }

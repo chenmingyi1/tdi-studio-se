@@ -75,6 +75,42 @@
                name="NewJDBCMigrationTask"
                version="6.5.0">
        </projecttask>
+       <projecttask
+             beforeLogon="false"
+             breaks="7.0.1"
+             class="org.talend.designer.core.generic.model.migration.NewJDBCConnectionMigrationTask"
+             description="Migration task for Generic JDBC connection  to TCOMP JDBC connection"
+             id="org.talend.designer.core.generic.model.migration.NewJDBCConnectionMigrationTask"
+             name="NewJDBCConnectionMigrationTask"
+             version="7.0.1">
+       </projecttask>
+       <projecttask
+             beforeLogon="false"
+             breaks="7.0.1"
+             class="org.talend.designer.core.generic.model.migration.DriverJarMigration"
+             description="Migration task for Driver Jar"
+             id="org.talend.designer.core.generic.model.migration.DriverJarMigration"
+             name="DriverJarMigration"
+             version="7.0.1">
+       </projecttask>
+       <projecttask
+             beforeLogon="true"
+             breaks="7.0.1"
+             class="org.talend.designer.core.generic.model.migration.ChangeDriverJarForProjectSetting"
+             description="Migration task for Driver Jar"
+             id="org.talend.designer.core.generic.model.migration.ChangeDriverJarForProjectSetting"
+             name="ChangeDriverJarForProjectSetting"
+             version="7.0.1">
+       </projecttask>
+       <projecttask
+             beforeLogon="false"
+             breaks="7.0.1"
+             class="org.talend.designer.core.generic.model.migration.ChangeDriverJarForProjectSetting"
+             description="Migration task for Driver Jar"
+             id="org.talend.designer.core.generic.model.migration.ChangeDriverJarForProjectSetting"
+             name="ChangeDriverJarForProjectSetting"
+             version="7.0.1">
+       </projecttask>
        <!--<projecttask
              beforeLogon="false"
              breaks="6.3.0"

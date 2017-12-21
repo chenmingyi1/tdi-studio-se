@@ -42,6 +42,7 @@ import org.talend.core.model.repository.ERepositoryObjectType;
 import org.talend.core.model.repository.IRepositoryViewObject;
 import org.talend.core.model.repository.RepositoryViewObject;
 import org.talend.core.model.utils.AbstractDragAndDropServiceHandler;
+import org.talend.core.model.utils.ContextParameterUtils;
 import org.talend.core.model.utils.IComponentName;
 import org.talend.core.repository.RepositoryComponentSetting;
 import org.talend.core.repository.model.repositoryObject.MetadataColumnRepositoryObject;
@@ -122,6 +123,9 @@ public class GenericDragAndDropHandler extends AbstractDragAndDropServiceHandler
                         Object paramValue = property.getStoredValue();
                         if (GenericTypeUtils.isStringType(property) || GenericTypeUtils.isObjectType(property)) {
                             if (paramValue != null) {
+                                if(property.getName().equals("password")){
+                                    return getPassword(connection, paramValue.toString());
+                                }
                                 return getRepositoryValueOfStringType(connection, paramValue.toString());
                             } else {
                                 return TalendQuoteUtils.addQuotes(""); //$NON-NLS-1$
@@ -142,6 +146,14 @@ public class GenericDragAndDropHandler extends AbstractDragAndDropServiceHandler
             return ((DatabaseConnection)connection).getDatabaseType();
         }
         return null;
+    }
+    
+    private String getPassword(Connection connection, String value){
+        String pass = connection.getValue(value, false);
+        if (ContextParameterUtils.isContextMode(connection, value)) {
+            return pass;
+        }
+        return TalendQuoteUtils.addQuotesIfNotExist(pass);
     }
     
     private Object getPropertiesValue(Connection connection, Properties properties,String value){
