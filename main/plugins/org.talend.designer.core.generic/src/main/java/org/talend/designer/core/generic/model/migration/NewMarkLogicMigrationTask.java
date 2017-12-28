@@ -16,9 +16,11 @@ import org.talend.core.model.properties.Item;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.property.Property;
 import org.talend.designer.core.generic.model.GenericElementParameter;
+import org.talend.designer.core.generic.utils.ParameterUtilTool;
 import org.talend.designer.core.generic.utils.SchemaUtils;
 import org.talend.designer.core.model.metadata.MetadataEmfFactory;
 import org.talend.designer.core.model.utils.emf.talendfile.ConnectionType;
+import org.talend.designer.core.model.utils.emf.talendfile.ElementParameterType;
 import org.talend.designer.core.model.utils.emf.talendfile.MetadataType;
 import org.talend.designer.core.model.utils.emf.talendfile.NodeType;
 
@@ -151,5 +153,25 @@ public class NewMarkLogicMigrationTask extends NewComponentFrameworkMigrationTas
             }
         }
         return sourceMetadata;
+    }
+    
+    @Override
+    protected ElementParameterType getParameterType(NodeType node, String paramName) {
+        ElementParameterType paramType = ParameterUtilTool.findParameterType(node, paramName);
+        if (node != null && paramType != null) {
+            Object value = ParameterUtilTool.convertParameterValue(paramType);
+            if ("ACTION_TYPE".equals(paramName)) {
+                if ("INSERT".equals(value)) {
+                    paramType.setValue("UPSERT");
+                }
+            } else if ("DOC_TYPE".equals(paramName)) {
+                if ("GENERIC".equals(value)) {
+                    paramType.setValue("MIXED");
+                } else if ("TEXT".equals(value)) {
+                    paramType.setValue("PLAIN_TEXT");
+                }
+            }
+        }
+        return paramType;
     }
 }
