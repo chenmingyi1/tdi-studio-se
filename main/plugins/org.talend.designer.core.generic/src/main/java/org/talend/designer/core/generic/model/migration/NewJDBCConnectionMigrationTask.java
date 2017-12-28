@@ -28,6 +28,7 @@ import org.talend.core.repository.model.ProxyRepositoryFactory;
 import org.talend.core.runtime.services.IGenericDBService;
 import org.talend.daikon.properties.Properties;
 import org.talend.daikon.properties.property.Property;
+import org.talend.designer.core.generic.constants.IGenericConstants;
 import org.talend.migration.IMigrationTask.ExecutionResult;
 
 /**
@@ -70,23 +71,34 @@ public class NewJDBCConnectionMigrationTask extends AbstractJobMigrationTask{
                 if(dbService == null){
                     return null; 
                 }
+                boolean isContextMode = connection.isContextMode();
                 Properties properties = dbService.getComponentProperties(jdbcType, dbConnection.getId());
                 Property url = (Property) properties.getProperty("connection.jdbcUrl");
                 Property driClass = (Property) properties.getProperty("connection.driverClass");
                 Property user = (Property) properties.getProperty("connection.userPassword.userId");
                 Property pass = (Property) properties.getProperty("connection.userPassword.password");
                 Property dirJar = (Property) properties.getProperty("connection.driverTable.drivers");
+                Property mappingFile = (Property) properties.getProperty("mappingFile");
                 if(url != null){
+                    url.setTaggedValue(IGenericConstants.IS_CONTEXT_MODE, isContextMode);
                     url.setValue(connection.getURL());
                 }
                 if(driClass != null){
+                    driClass.setTaggedValue(IGenericConstants.IS_CONTEXT_MODE, isContextMode);
                     driClass.setValue(connection.getDriverClass());
                 }
                 if(user != null){
+                    user.setTaggedValue(IGenericConstants.IS_CONTEXT_MODE, isContextMode);
                     user.setValue(connection.getUsername());
                 }
                 if(pass != null){
-                    pass.setValue(connection.getPassword());
+                    pass.setTaggedValue(IGenericConstants.IS_CONTEXT_MODE, isContextMode);
+                    String password = connection.getValue(connection.getRawPassword(), false);
+                    pass.setValue(password);
+                }
+                if(mappingFile != null){
+                    mappingFile.setTaggedValue(IGenericConstants.IS_CONTEXT_MODE, isContextMode);
+                    mappingFile.setValue(connection.getDbmsId());
                 }
                 setDrivers(dirJar, connection.getDriverJarPath());
                 connection.setCompProperties(properties.toSerialized());
