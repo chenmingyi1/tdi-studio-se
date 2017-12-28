@@ -113,6 +113,9 @@ for (Component.CodegenPropInfo propInfo : propsToProcess) {
             }
             boolean referenced = false;
             for(String r: referenceableProperties){
+            		if(r == null || r.isEmpty()) {
+            			continue;
+            		}
                 referenced = referenced || propInfo.fieldName.startsWith(r);
             }
             if (referenced){
