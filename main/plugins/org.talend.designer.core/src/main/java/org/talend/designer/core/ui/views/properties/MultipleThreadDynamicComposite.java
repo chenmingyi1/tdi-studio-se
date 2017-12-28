@@ -370,6 +370,15 @@ public class MultipleThreadDynamicComposite extends ScrolledComposite implements
 
         maxRow = 0;
         List<? extends IElementParameter> listParam = elem.getElementParametersWithChildrens();
+
+        IElementParameter unifiedParam = elem.getElementParameterFromField(EParameterFieldType.UNIFIED_COMPONENTS);
+        if (unifiedParam != null) {
+            for (IElementParameter param : listParam) {
+                int numRow = param.getNumRow();
+                param.setNumRow(numRow + 1);
+            }
+        }
+
         Map<String, Integer> groupPosition = new HashMap<String, Integer>();
         for (int i = 0; i < listParam.size(); i++) {
             IElementParameter param = listParam.get(i);
@@ -474,7 +483,7 @@ public class MultipleThreadDynamicComposite extends ScrolledComposite implements
                         subComposite = composite;
                         curTop = DEFAULT_GROUP_HEIGHT * (groupPosition.size() > 0 ? 1 : 0) + heightSize;
                     }
-                    if(!isShouldCreateControl(curParam)){
+                    if (!isShouldCreateControl(curParam)) {
                         continue;
                     }
                     lastControl = controller.createControl(subComposite, curParam, curNumInRow, curNbInRow, curTop,
@@ -494,8 +503,8 @@ public class MultipleThreadDynamicComposite extends ScrolledComposite implements
         minHeight = heightSize;
         resizeScrolledComposite();
     }
-    
-    protected boolean isShouldCreateControl(IElementParameter curParam){
+
+    protected boolean isShouldCreateControl(IElementParameter curParam) {
         return true;
     }
 

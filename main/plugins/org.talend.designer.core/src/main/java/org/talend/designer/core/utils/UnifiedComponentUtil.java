@@ -15,14 +15,17 @@ package org.talend.designer.core.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.ui.PlatformUI;
 import org.talend.core.GlobalServiceRegister;
 import org.talend.core.model.components.IComponent;
+import org.talend.core.model.components.IComponentsHandler;
 import org.talend.core.model.components.IComponentsService;
 import org.talend.core.model.process.IElementParameter;
 import org.talend.core.model.process.INode;
 import org.talend.core.model.utils.IComponentName;
 import org.talend.core.repository.RepositoryComponentSetting;
+import org.talend.core.ui.component.ComponentsFactoryProvider;
 import org.talend.designer.core.IUnifiedComponentService;
 import org.talend.designer.core.model.components.EParameterName;
 import org.talend.designer.core.ui.editor.nodes.Node;
@@ -33,6 +36,8 @@ import org.talend.designer.core.ui.views.properties.ComponentSettingsView;
  *
  */
 public class UnifiedComponentUtil {
+
+    private static Logger log = Logger.getLogger(UnifiedComponentUtil.class);
 
     public static IComponent getEmfComponent(Node node, IComponent component) {
         if (isDelegateComponent(component)) {
@@ -45,6 +50,8 @@ public class UnifiedComponentUtil {
                 IComponent emfComponent = compService.getComponentsFactory().get(emfCompName, paletteType);
                 if (emfComponent != null) {
                     return emfComponent;
+                } else {
+                    log.error("Can't find component " + emfCompName);
                 }
             }
         }
@@ -103,9 +110,18 @@ public class UnifiedComponentUtil {
             List<IComponent> filtedList = new ArrayList<IComponent>();
             IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
                     IUnifiedComponentService.class);
+            IComponentsHandler componentsHandler = ComponentsFactoryProvider.getInstance().getComponentsHandler();
             for (IComponent component : componentList) {
+                if (componentsHandler != null && componentsHandler.extractComponentsCategory() != null) {
+                    if (!component.getPaletteType().equals(componentsHandler.extractComponentsCategory().getName())) {
+                        continue;
+                    }
+                }
                 IComponent delegateComponent = service.getDelegateComponent(component);
-                if (delegateComponent != null && !filtedList.contains(delegateComponent)) {
+                if (delegateComponent != null) {
+                    if (!filtedList.contains(delegateComponent)) {
+                        filtedList.add(delegateComponent);
+                    }
                     if (component.getName().equals(setting.getInputComponent())) {
                         setting.setInputComponent(delegateComponent.getName());
                     }
@@ -115,7 +131,6 @@ public class UnifiedComponentUtil {
                     if (component.getName().equals(setting.getDefaultComponent())) {
                         setting.setDefaultComponent(delegateComponent.getName());
                     }
-                    filtedList.add(delegateComponent);
                 } else {
                     filtedList.add(component);
                 }
@@ -130,12 +145,14 @@ public class UnifiedComponentUtil {
             IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
                     IUnifiedComponentService.class);
             String paletteType = selectedComponent.getPaletteType();
-            String unifiedCompName = service.getUnifiedComponetName4DndFromRepository(setting, selectedComponent);
+            String emfCompName = service.getUnifiedComponetName4DndFromRepository(setting, selectedComponent);
             IComponentsService compService = (IComponentsService) GlobalServiceRegister.getDefault().getService(
                     IComponentsService.class);
-            IComponent emfComponent = compService.getComponentsFactory().get(unifiedCompName, paletteType);
+            IComponent emfComponent = compService.getComponentsFactory().get(emfCompName, paletteType);
             if (emfComponent != null) {
                 return emfComponent;
+            } else {
+                log.error("Can't find component " + emfCompName);
             }
         }
         return selectedComponent;
