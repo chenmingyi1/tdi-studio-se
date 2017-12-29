@@ -385,6 +385,23 @@ public final class TalendEditorPaletteFactory {
             lowerCasedKeyword = keyword.toLowerCase().trim();
         }
 
+        List<IComponent> componentAll = new ArrayList<IComponent>(compFac.readComponents());
+        // filter usefull components
+
+        if (compFac != null && componentsHandler != null) {
+            componentAll = componentsHandler.filterComponents(componentAll);
+        }
+
+        if (needCheckVisible) {
+            Iterator<IComponent> iter = componentAll.iterator();
+            while (iter.hasNext()) {
+                IComponent component = iter.next();
+                if (component == null || !ComponentUtilities.isComponentVisible(component) || component.isTechnical()) {
+                    iter.remove();
+                }
+            }
+        }
+
         /**
          * No need to sort result from help, since it may confuse user
          */
@@ -431,7 +448,7 @@ public final class TalendEditorPaletteFactory {
             if (componentNameMap != null) {
 
                 // 2.1 search from local palette
-                addComponentsByNameFilter(compFac, componentSet, lowerCasedKeyword);
+                addComponentsByNameFilter(compFac, componentSet, componentAll, lowerCasedKeyword);
                 if (!componentSet.isEmpty()) {
                     componentSet = new LinkedHashSet<IComponent>(sortResultsBasedOnRecentlyUsed(new ArrayList<IComponent>(
                             componentSet)));
@@ -483,31 +500,16 @@ public final class TalendEditorPaletteFactory {
             }
         } else if (compFac != null) {
             componentSet = new LinkedHashSet<IComponent>();
-            componentSet.addAll(compFac.readComponents());
-            addDelegateComponents(compFac, componentSet);
+            componentSet.addAll(componentAll);
         }
+
+        addDelegateComponents(componentSet);
 
         List<IComponent> relatedComponents = null;
         if (componentSet == null || componentSet.isEmpty()) {
             relatedComponents = new LinkedList<IComponent>();
         } else {
             relatedComponents = new LinkedList<IComponent>(componentSet);
-        }
-
-        // filter usefull components
-
-        if (compFac != null && componentsHandler != null && !relatedComponents.isEmpty()) {
-            relatedComponents = componentsHandler.filterComponents(relatedComponents);
-        }
-
-        if (needCheckVisible && relatedComponents != null && !relatedComponents.isEmpty()) {
-            Iterator<IComponent> iter = relatedComponents.iterator();
-            while (iter.hasNext()) {
-                IComponent component = iter.next();
-                if (component == null || !ComponentUtilities.isComponentVisible(component) || component.isTechnical()) {
-                    iter.remove();
-                }
-            }
         }
 
         if (needSort) {
@@ -586,15 +588,13 @@ public final class TalendEditorPaletteFactory {
     }
 
     protected static void addComponentsByNameFilter(final IComponentsFactory compFac, Collection<IComponent> componentSet,
-            String nameFilter) {
+            List<IComponent> componentAll, String nameFilter) {
         if (compFac == null || componentSet == null) {
             return;
         }
 
         if (nameFilter != null && !nameFilter.trim().isEmpty()) {
-            List<IComponent> components = new ArrayList<IComponent>(compFac.readComponents());
-            addDelegateComponents(compFac, components);
-            Iterator<IComponent> iter = components.iterator();
+            Iterator<IComponent> iter = componentAll.iterator();
             String regex = getFilterRegex(nameFilter);
             Pattern pattern = Pattern.compile(regex);
             Set<ComponentHit> resultByName = new LinkedHashSet<ComponentHit>();
@@ -625,6 +625,7 @@ public final class TalendEditorPaletteFactory {
                 addComponents(componentSet, hitArray);
             }
         }
+
     }
 
     private static void addComponents(Collection<IComponent> componentSet, ComponentHit[] hitArray) {
@@ -634,25 +635,26 @@ public final class TalendEditorPaletteFactory {
         }
     }
 
-    private static void addDelegateComponents(IComponentsFactory factory, Collection<IComponent> componentSet) {
+    private static void addDelegateComponents(Collection<IComponent> componentSet) {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {
             IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
                     IUnifiedComponentService.class);
+            Map<String, IComponent> delegateMap = new HashMap<String, IComponent>();
             // filter unified components
             Iterator<IComponent> iterator = componentSet.iterator();
             while (iterator.hasNext()) {
                 IComponent next = iterator.next();
-                if (service.isUnifiedComponent(next)) {
+                IComponent delegateComp = service.getDelegateComponent(next);
+                if (service.isDelegateComponent(delegateComp)) {
+                    if (!delegateMap.containsKey(delegateComp.getName())) {
+                        delegateMap.put(delegateComp.getName(), delegateComp);
+                    }
                     iterator.remove();
                 }
             }
 
             // add delegate components
-            String paletteType = ComponentCategory.CATEGORY_4_DI.getName();
-            if (factory.getComponentsHandler() != null) {
-                paletteType = factory.getComponentsHandler().extractComponentsCategory().getName();
-            }
-            componentSet.addAll(service.getDelegateComponents(paletteType));
+            componentSet.addAll(delegateMap.values());
         }
     }
 
@@ -683,6 +685,8 @@ public final class TalendEditorPaletteFactory {
             if (!ComponentUtilities.isComponentVisible(recentlyUsedComponent)) {
                 continue;
             }
+
+            recentlyUsedComponent = UnifiedComponentUtil.getDelegateComponent(recentlyUsedComponent);
 
             ++i;
             PaletteDrawer componentsDrawer = ht.get(RECENTLY_USED);
@@ -1110,7 +1114,6 @@ public final class TalendEditorPaletteFactory {
                 recentlyUsedList.add(recentlyUsedComponent);
             }
         }
-
         return recentlyUsedNameList;
     }
 
