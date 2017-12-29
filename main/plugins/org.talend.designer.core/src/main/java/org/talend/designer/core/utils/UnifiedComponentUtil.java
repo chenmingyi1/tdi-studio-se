@@ -96,11 +96,12 @@ public class UnifiedComponentUtil {
         }
     }
 
-    public static void switchComponent(INode node, IComponent delegateComponent, List<? extends IElementParameter> oldParms) {
+    public static void switchComponent(INode node, IComponent delegateComponent, String oldEmfComponent,
+            List<? extends IElementParameter> oldParms) {
         if (GlobalServiceRegister.getDefault().isServiceRegistered(IUnifiedComponentService.class)) {
             IUnifiedComponentService service = (IUnifiedComponentService) GlobalServiceRegister.getDefault().getService(
                     IUnifiedComponentService.class);
-            service.switchComponent(node, delegateComponent, oldParms);
+            service.switchComponent(node, delegateComponent, oldEmfComponent, oldParms);
         }
 
     }

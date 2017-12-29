@@ -74,7 +74,8 @@ public interface IUnifiedComponentService extends IService {
      */
     public void createParameters(INode node, List<IElementParameter> listParams, IComponent delegateComp, IComponent emfComp);
 
-    public void switchComponent(INode node, IComponent delegateComponent, List<? extends IElementParameter> oldParms);
+    public void switchComponent(INode node, IComponent delegateComponent, String oldEmfComponent,
+            List<? extends IElementParameter> oldParms);
 
     public String getUnifiedCompDisplayName(IComponent delegateComponent, String emfComponent);
 }

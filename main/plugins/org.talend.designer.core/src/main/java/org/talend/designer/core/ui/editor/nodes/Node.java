@@ -4777,7 +4777,9 @@ public class Node extends Element implements IGraphicalNode {
 
         if (obj != null) {
             if (UnifiedComponentUtil.isDelegateComponent(getDelegateComponent())) {
-                UnifiedComponentUtil.switchComponent(this, component, (List<? extends IElementParameter>) obj);
+                Object object = parameters.get(INode.OLD_UNIFIED_COMPONENT);
+                String oldComponent = object == null ? null : object.toString();
+                UnifiedComponentUtil.switchComponent(this, component, oldComponent, (List<? extends IElementParameter>) obj);
             } else {
                 List<? extends IElementParameter> oldElementParameters = (List<? extends IElementParameter>) obj;
                 for (IElementParameter sourceParam : oldElementParameters) {
