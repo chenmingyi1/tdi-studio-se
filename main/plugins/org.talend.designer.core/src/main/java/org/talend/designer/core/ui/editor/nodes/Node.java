@@ -4759,6 +4759,7 @@ public class Node extends Element implements IGraphicalNode {
         this.isUpdate = isUpdate;
         reloadingComponent = true;
         currentStatus = 0;
+        oldStatus = 0;
         Object obj = parameters.get(INode.RELOAD_PARAMETER_ELEMENT_PARAMETERS);
         Map<String, Object> storeValueMap = storeValue(obj);
         init(component);
