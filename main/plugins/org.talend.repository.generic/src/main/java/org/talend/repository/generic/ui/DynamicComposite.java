@@ -377,7 +377,7 @@ public class DynamicComposite extends MissingSettingsMultiThreadDynamicComposite
 
                 @Override
                 public void run() {
-                    MessageDialog.openInformation(getShell(), elem.getElementName(), message);
+                    MessageDialog.openInformation(getShell(), "", message); //$NON-NLS-1$
                 }
             });
             break;
