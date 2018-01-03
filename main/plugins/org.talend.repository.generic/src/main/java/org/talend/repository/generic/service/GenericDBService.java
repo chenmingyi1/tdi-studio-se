@@ -227,10 +227,12 @@ public class GenericDBService implements IGenericDBService{
                         compService.afterFormFinish(form.getName(), form.getProperties());
                     }
                     IRepositoryViewObject repViewObj = factory.getLastVersion(connItem.getProperty().getId());
+                    String compProperties = connItem.getConnection().getCompProperties();
                     if(repViewObj != null){
                         Property property = repViewObj.getProperty();
                         if (property != null) {
                             connItem = (ConnectionItem) property.getItem();
+                            connItem.getConnection().setCompProperties(compProperties);
                         }
                     }
                     convertPropertiesToDBElements(form.getProperties(), connItem.getConnection());
