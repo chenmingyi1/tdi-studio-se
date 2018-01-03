@@ -127,7 +127,7 @@ public class GenericDBService implements IGenericDBService{
         }
         
         List<Form> forms = componentWizard.getForms();
-        Element baseElement = new FakeElement(forms.get(0).getName());
+        Element baseElement = new FakeElement("");//$NON-NLS-1$
         DBDynamicComposite dynamicComposite = new DBDynamicComposite(composite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.NO_FOCUS, EComponentCategory.BASIC,
                 baseElement,(ConnectionItem)property.getItem(), true, composite.getBackground(), forms.get(0), false);
         dynamicComposite.setLayoutData(createMainFormData(true));
